@@ -17,21 +17,21 @@
 - Temas con más solicitudes y tasa de resolución.
 - Retos activos, equipos y equipos interuniversitarios.
 
-## Metas propuestas para un piloto de un semestre
+## Metas propuestas para un piloto de 8 semanas
 
 | Indicador | Meta |
 | --- | --- |
-| Estudiantes registrados | 300 en al menos 3 universidades y 2 países |
-| Comunidades activas | 15 |
-| Horas de mentoría confirmadas | 500 |
-| Satisfacción de la mentoría | 4,5 de 5 o más |
-| Retos con equipo interuniversitario | 5 |
-| Sentido de pertenencia (encuesta antes y después) | Mejora significativa en participantes frente a no participantes |
+| Estudiantes registrados | 60, de ULASALLE (Arequipa) y Unisalle (Bogotá) |
+| Comunidades activas | 4 |
+| Horas de mentoría confirmadas | 100 |
+| Satisfacción de la mentoría | 4 de 5 o más |
+| Retos con equipo interuniversitario | 2 |
+| Sentido de pertenencia (encuesta antes y después) | Mejora en los participantes |
 
 Las metas son propuestas del equipo para validar con Bienestar Universitario; no son resultados.
 
 ## Evaluación
 
-1. Encuesta de pertenencia y uso al inicio y al final del semestre.
+1. Encuesta de pertenencia y uso al inicio y al final del piloto.
 2. Comparación de permanencia entre estudiantes que reciben mentoría y estudiantes con perfil similar que no la reciben, con datos anonimizados de la universidad.
 3. Entrevistas con comunidades rurales que publicaron retos.
