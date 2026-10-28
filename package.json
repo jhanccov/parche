@@ -1,0 +1,16 @@
+{
+  "name": "parche",
+  "private": true,
+  "version": "2.0.0",
+  "description": "Parche: comunidades, mentoría entre pares y retos del territorio para estudiantes La Salle de Colombia y Perú",
+  "packageManager": "pnpm@10.28.0",
+  "engines": { "node": ">=20" },
+  "scripts": {
+    "dev": "pnpm -r --parallel dev",
+    "build": "pnpm -r build",
+    "test": "pnpm --filter @parche/api test",
+    "db:migrate": "pnpm --filter @parche/api migrate",
+    "db:seed": "pnpm --filter @parche/api seed",
+    "typecheck": "pnpm -r typecheck"
+  }
+}
