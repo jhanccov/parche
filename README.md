@@ -80,6 +80,11 @@ pnpm test                        # 9 pruebas de integración de la API
 
 ## Equipo
 
+| Integrante | Rol | GitHub |
+| --- | --- | --- |
+| José Luis Hancco Valencia | Líder del proyecto, propuesta de valor y desarrollo | [@jhanccov](https://github.com/jhanccov) |
+| Roger Infa Sanchez | Desarrollo full stack e identidad visual | [@rogerinfas](https://github.com/rogerinfas) |
+
 Estudiantes de Ingeniería de Software de la Universidad La Salle (Arequipa, Perú), en colaboración con la red La Salle de Colombia. Proyecto para el Evento Internacional de Innovación Tecnológica de La Salle Engineering and Technology School Alliance (noviembre de 2026).
 
 Los retos y usuarios incluidos en los datos de demostración son ejemplos ilustrativos.

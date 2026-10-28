@@ -44,8 +44,8 @@ const USERS = [
   ['yeison', 'Yeison Cárdenas', 'unisalle', 'utopia', 'Ingeniería Agronómica', 6, ['Agronomía', 'Emprendimiento'], ['Apps móviles', 'IoT y sensores'], 'Vengo de Arauca. Mi proyecto productivo es de ganadería sostenible.'],
   ['daniela', 'Daniela Ospina', 'unilasallista', 'caldas', 'Ingeniería Informática', 4, ['Diseño UX', 'Apps móviles'], ['Emprendimiento'], 'Diseño apps que la gente de verdad entiende.'],
   ['mateo', 'Mateo Giraldo', 'unilasallista', 'caldas', 'Ingeniería Ambiental', 5, ['Ciencia de datos', 'Estadística'], ['Inteligencia artificial'], 'Datos para decidir mejor en el campo.'],
-  ['jose', 'José Luis H. V.', 'ulasalle', 'arequipa', 'Ingeniería de Software', 3, ['Cálculo', 'Economía', 'Álgebra lineal'], ['Cloud (AWS)', 'Inteligencia artificial'], 'Economista y estudiante de software. Mentor de matemática.'],
-  ['roger', 'Roger I.', 'ulasalle', 'arequipa', 'Ingeniería de Software', 3, ['Desarrollo web', 'Programación'], ['Cloud (AWS)'], 'Full stack. Construyendo Parche.'],
+  ['jose', 'José Luis Hancco Valencia', 'ulasalle', 'arequipa', 'Ingeniería de Software', 3, ['Cálculo', 'Economía', 'Álgebra lineal'], ['Cloud (AWS)', 'Inteligencia artificial'], 'Economista y estudiante de software. Mentor de matemática.'],
+  ['roger', 'Roger Infa Sanchez', 'ulasalle', 'arequipa', 'Ingeniería de Software', 3, ['Desarrollo web', 'Programación'], ['Cloud (AWS)'], 'Full stack. Construyendo Parche.'],
   ['luciana', 'Luciana Quispe', 'ulasalle', 'arequipa', 'Ingeniería Industrial', 4, ['Gestión de proyectos', 'Redacción académica'], ['Ciencia de datos'], 'Organizo proyectos con impacto en el Colca.'],
   ['diego', 'Diego Mamani', 'ulasalle', 'arequipa', 'Ingeniería de Software', 2, ['Robótica', 'C++'], ['IoT y sensores'], 'Robótica y sensores. Primer año, muchas ganas.'],
 ] as const;
