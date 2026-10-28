@@ -70,6 +70,15 @@ createdb parche_test             # base de datos de pruebas
 pnpm test                        # 9 pruebas de integración de la API
 ```
 
+### Publicar en internet (Render)
+
+El `Dockerfile` de la raíz arma una sola imagen: la API sirve también la app web. El archivo `render.yaml` crea el servicio y la base de datos.
+
+1. Entra a https://render.com con tu cuenta de GitHub.
+2. New > Blueprint > elige este repositorio > Apply.
+3. En el servicio `parche`, pestaña Environment, define `SMTP_URL` para enviar los códigos de acceso. Con Gmail (requiere verificación en dos pasos y una contraseña de aplicación): `smtps://tucorreo%40gmail.com:CONTRASENA_DE_APLICACION@smtp.gmail.com:465`.
+4. Comparte la dirección `https://parche-xxxx.onrender.com` que muestra Render.
+
 ## Documentos de la entrega
 
 - [`docs/entrega/Parche_Poster.jpg`](docs/entrega/Parche_Poster.jpg): póster en alta resolución (3600 x 5400 px)

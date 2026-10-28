@@ -42,7 +42,13 @@ export default async function authRoutes(app: FastifyInstance) {
        on conflict (email) do update set code_hash = excluded.code_hash, expires_at = excluded.expires_at, attempts = 0`,
       [e, hash(code)],
     );
-    const sent = await sendCode(e, code);
+    let sent = false;
+    try {
+      sent = await sendCode(e, code);
+    } catch (err) {
+      req.log.error(err, 'No se pudo enviar el correo');
+    }
+    if (!sent && !config.demoMode) throw new HttpError(503, 'No pudimos enviar el código a tu correo. Intenta de nuevo en unos minutos.');
     return { ok: true, university: uni.short_name, sent, devCode: !sent && config.demoMode ? code : undefined };
   });
 

@@ -2,6 +2,9 @@ import Fastify, { FastifyReply, FastifyRequest } from 'fastify';
 import cors from '@fastify/cors';
 import jwt from '@fastify/jwt';
 import rateLimit from '@fastify/rate-limit';
+import fastifyStatic from '@fastify/static';
+import { existsSync } from 'node:fs';
+import { resolve } from 'node:path';
 import { ZodError } from 'zod';
 import { config } from './config.js';
 import { one, q } from './db.js';
@@ -79,6 +82,16 @@ export async function buildApp() {
   await app.register(mapRoutes, { prefix: '/api/map' });
   await app.register(impactRoutes, { prefix: '/api/impact' });
   await app.register(reportRoutes, { prefix: '/api/reports' });
+
+  // En producción la misma API sirve la app web compilada (un solo servicio).
+  const webDist = process.env.WEB_DIST ? resolve(process.env.WEB_DIST) : '';
+  if (webDist && existsSync(webDist)) {
+    await app.register(fastifyStatic, { root: webDist, wildcard: false });
+    app.setNotFoundHandler((req, reply) => {
+      if (req.method !== 'GET' || req.url.startsWith('/api/')) return reply.status(404).send({ error: 'No encontrado' });
+      return reply.type('text/html').sendFile('index.html');
+    });
+  }
 
   return app;
 }
