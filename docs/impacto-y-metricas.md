@@ -21,9 +21,9 @@
 
 | Indicador | Meta |
 | --- | --- |
-| Estudiantes registrados | 60, de ULASALLE (Arequipa) y Unisalle (Bogotá) |
-| Comunidades activas | 4 |
-| Horas de mentoría confirmadas | 100 |
+| Estudiantes registrados | 30, de ULASALLE (Arequipa) y Unisalle (Bogotá) |
+| Comunidades activas | 2 |
+| Horas de mentoría confirmadas | 50 |
 | Satisfacción de la mentoría | 4 de 5 o más |
 | Retos con equipo interuniversitario | 2 |
 | Sentido de pertenencia (encuesta antes y después) | Mejora en los participantes |

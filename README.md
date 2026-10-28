@@ -70,6 +70,12 @@ createdb parche_test             # base de datos de pruebas
 pnpm test                        # 9 pruebas de integración de la API
 ```
 
+## Documentos de la entrega
+
+- [`docs/entrega/Parche_Poster.jpg`](docs/entrega/Parche_Poster.jpg): póster en alta resolución (3600 x 5400 px)
+- [`docs/entrega/Parche_Resumen_Ejecutivo.docx`](docs/entrega/Parche_Resumen_Ejecutivo.docx): resumen ejecutivo (5 páginas)
+- [`docs/entrega/Parche_Presentacion.pptx`](docs/entrega/Parche_Presentacion.pptx): presentación (10 láminas)
+
 ## Documentación
 
 - [`docs/propuesta-de-valor.md`](docs/propuesta-de-valor.md): problema, solución, impacto y diferenciales
