@@ -1,9 +1,12 @@
 import { FormEvent, useEffect, useState } from 'react';
 import { Navigate, useNavigate } from 'react-router-dom';
-import { ShieldCheck, Users, Mountain, HandHelping } from 'lucide-react';
+import { ShieldCheck } from 'lucide-react';
 import { api } from '../lib/api';
 import { useAuth } from '../lib/auth';
 import { Avatar, ErrorMsg } from '../components/ui';
+
+const VERBS = ['Aprende', 'Crea', 'Conecta', 'Transforma'];
+const BUBBLES = ['💻', '📐', '🤝', '🏔️', '🚀', '🎭', '⚽', '🔬', '🌱', '☁️'];
 
 type Demo = { id: string; name: string; career: string; university: string; campus: string };
 
@@ -18,8 +21,17 @@ export default function Login() {
   const [busy, setBusy] = useState(false);
   const [demos, setDemos] = useState<Demo[]>([]);
 
+  const [verb, setVerb] = useState(0);
+
   useEffect(() => {
     api<Demo[]>('/auth/demo-users').then(setDemos).catch(() => {});
+  }, []);
+
+  useEffect(() => {
+    document.body.classList.add('dark-page');
+    const reduce = window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
+    const t = reduce ? undefined : setInterval(() => setVerb((v) => (v + 1) % VERBS.length), 2200);
+    return () => { document.body.classList.remove('dark-page'); if (t) clearInterval(t); };
   }, []);
 
   if (me) return <Navigate to="/" replace />;
@@ -62,24 +74,23 @@ export default function Login() {
 
   return (
     <div className="login">
+      <div className="bubbles" aria-hidden>
+        {BUBBLES.map((b, i) => <span key={i} style={{ left: `${(i * 37) % 92}%`, animationDelay: `${-i * 1.7}s`, animationDuration: `${13 + (i % 4) * 3}s` }}>{b}</span>)}
+      </div>
       <div className="login-hero">
-        <img src="/logo.png" alt="Parche" className="login-logo" />
-        <h1>Comunidades que conectan La Salle</h1>
-        <p>Aprende con tus pares, crea tu comunidad y resuelve retos reales del territorio, con estudiantes de Colombia y Perú.</p>
-        <ul className="login-points">
-          <li><Users size={18} /> Comunidades estudiantiles</li>
-          <li><HandHelping size={18} /> Mentoría entre pares</li>
-          <li><Mountain size={18} /> Retos del territorio</li>
-        </ul>
+        <span className="wordmark big">parche<i aria-hidden>✦</i></span>
+        <h1><span className="verb" key={verb}>{VERBS[verb]}</span><br />con tu parche La Salle</h1>
+        <p>Comunidades, mentoría entre pares y retos reales con estudiantes de Perú y Colombia.</p>
+        <div className="login-tags"><span>👥 Comunidades</span><span>🤝 Mentoría</span><span>🏔️ Retos</span></div>
       </div>
 
       <div className="card login-card">
         {step === 'email' ? (
           <form onSubmit={requestCode}>
             <label htmlFor="email">Tu correo institucional</label>
-            <input id="email" type="email" required value={email} onChange={(e) => setEmail(e.target.value)} placeholder="nombre@unisalle.edu.co" autoComplete="email" />
+            <input id="email" type="email" required value={email} onChange={(e) => setEmail(e.target.value)} placeholder="nombre@ulasalle.edu.pe" autoComplete="email" />
             <ErrorMsg msg={err} />
-            <button className="btn gold block" disabled={busy}>{busy ? 'Enviando...' : 'Recibir código'}</button>
+            <button className="btn gold block big" disabled={busy}>{busy ? 'Enviando...' : 'Recibir mi código'}</button>
             <p className="muted small"><ShieldCheck size={14} /> Solo estudiantes de la red La Salle. Nadie ve tu ubicación.</p>
           </form>
         ) : (

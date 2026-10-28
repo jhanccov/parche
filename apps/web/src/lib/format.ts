@@ -1,10 +1,10 @@
-export const CATEGORIES: Record<string, { label: string; color: string }> = {
-  tecnologia: { label: 'Tecnología', color: '#0B4A7E' },
-  investigacion: { label: 'Investigación', color: '#6B4C9A' },
-  territorio: { label: 'Territorio', color: '#2F7D5C' },
-  cultura: { label: 'Cultura', color: '#B5482E' },
-  deporte: { label: 'Deporte', color: '#B07A00' },
-  bienestar: { label: 'Bienestar', color: '#1F7A8C' },
+export const CATEGORIES: Record<string, { label: string; color: string; emoji: string; grad: string }> = {
+  tecnologia: { label: 'Tecnología', color: '#0B4A7E', emoji: '💻', grad: 'linear-gradient(155deg,#1E5BFF 0%,#0B2A6B 60%,#06162B 100%)' },
+  investigacion: { label: 'Investigación', color: '#6B4C9A', emoji: '🔬', grad: 'linear-gradient(155deg,#8B5CF6 0%,#3B1D7A 60%,#140B2E 100%)' },
+  territorio: { label: 'Territorio', color: '#2F7D5C', emoji: '🌄', grad: 'linear-gradient(155deg,#12C28A 0%,#0B5E47 60%,#062B22 100%)' },
+  cultura: { label: 'Cultura', color: '#B5482E', emoji: '🎭', grad: 'linear-gradient(155deg,#FF4D8D 0%,#8E1E52 60%,#2E0A1C 100%)' },
+  deporte: { label: 'Deporte', color: '#B07A00', emoji: '⚽', grad: 'linear-gradient(155deg,#FFB800 0%,#B85C00 60%,#3A1A00 100%)' },
+  bienestar: { label: 'Bienestar', color: '#1F7A8C', emoji: '🌱', grad: 'linear-gradient(155deg,#18C6B3 0%,#0B6070 60%,#062A30 100%)' },
 };
 
 export const ODS: Record<number, string> = {
