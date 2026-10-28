@@ -15,10 +15,10 @@ services:
         generateValue: true
       - key: DEMO_MODE
         value: "false"
-      - key: SMTP_URL
+      - key: BREVO_API_KEY
         sync: false
       - key: MAIL_FROM
-        value: Parche <no-reply@parche.app>
+        sync: false
 
 databases:
   - name: parche-db

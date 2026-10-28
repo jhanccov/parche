@@ -76,7 +76,7 @@ El `Dockerfile` de la raíz arma una sola imagen: la API sirve también la app w
 
 1. Entra a https://render.com con tu cuenta de GitHub.
 2. New > Blueprint > elige este repositorio > Apply.
-3. En el servicio `parche`, pestaña Environment, define `SMTP_URL` para enviar los códigos de acceso. Con Gmail (requiere verificación en dos pasos y una contraseña de aplicación): `smtps://tucorreo%40gmail.com:CONTRASENA_DE_APLICACION@smtp.gmail.com:465`.
+3. Los planes gratis de Render bloquean el correo SMTP, así que los códigos se envían con la API de Brevo (gratis, 300 correos al día). En https://brevo.com crea una cuenta, verifica tu correo remitente y genera una API key. En el servicio `parche`, pestaña Environment, define `BREVO_API_KEY` y `MAIL_FROM` (por ejemplo `Parche <tucorreo@gmail.com>`, con el mismo correo verificado). En un plan pagado también puedes usar `SMTP_URL`.
 4. Comparte la dirección `https://parche-xxxx.onrender.com` que muestra Render.
 
 ## Documentos de la entrega

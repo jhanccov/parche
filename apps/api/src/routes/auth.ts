@@ -16,15 +16,28 @@ async function universityForEmail(email: string) {
   );
 }
 
+function parseFrom(from: string) {
+  const m = from.match(/^\s*(.*?)\s*<([^>]+)>\s*$/);
+  return m ? { name: m[1] || 'Parche', email: m[2] } : { name: 'Parche', email: from.trim() };
+}
+
 async function sendCode(email: string, code: string) {
+  const subject = `Tu código de Parche: ${code}`;
+  const text = `Tu código para entrar a Parche es ${code}. Vence en 10 minutos.`;
+  if (config.brevoApiKey) {
+    // API HTTP de Brevo: funciona aunque el servidor bloquee los puertos SMTP.
+    const res = await fetch('https://api.brevo.com/v3/smtp/email', {
+      method: 'POST',
+      headers: { 'api-key': config.brevoApiKey, 'content-type': 'application/json', accept: 'application/json' },
+      body: JSON.stringify({ sender: parseFrom(config.mailFrom), to: [{ email }], subject, textContent: text }),
+      signal: AbortSignal.timeout(10000),
+    });
+    if (!res.ok) throw new Error(`Brevo ${res.status}: ${await res.text()}`);
+    return true;
+  }
   if (!config.smtpUrl) return false;
-  const t = nodemailer.createTransport(config.smtpUrl);
-  await t.sendMail({
-    from: config.mailFrom,
-    to: email,
-    subject: `Tu código de Parche: ${code}`,
-    text: `Tu código para entrar a Parche es ${code}. Vence en 10 minutos.`,
-  });
+  const t = nodemailer.createTransport(config.smtpUrl, { connectionTimeout: 10000, greetingTimeout: 10000 } as any);
+  await t.sendMail({ from: config.mailFrom, to: email, subject, text });
   return true;
 }
 
