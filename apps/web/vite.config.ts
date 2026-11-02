@@ -26,7 +26,7 @@ export default defineConfig({
         navigateFallbackDenylist: [/^\/api/],
         runtimeCaching: [
           { urlPattern: /\/api\/(communities|challenges|help|events|map|impact|me|universities|skills)/, handler: 'NetworkFirst', options: { cacheName: 'api', networkTimeoutSeconds: 4 } },
-          { urlPattern: /tile\.openstreetmap\.org|basemaps\.cartocdn\.com/, handler: 'CacheFirst', options: { cacheName: 'tiles', expiration: { maxEntries: 400 } } },
+          { urlPattern: /tile\.openstreetmap\.org/, handler: 'CacheFirst', options: { cacheName: 'tiles', expiration: { maxEntries: 400, maxAgeSeconds: 7 * 24 * 3600 } } },
         ],
       },
     }),
