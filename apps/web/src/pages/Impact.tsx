@@ -51,8 +51,9 @@ export default function Impact() {
       <Section title="Mentores que más aportan">
         <div className="list card">
           {data.topMentors.map((m: any, i: number) => (
-            <div key={m.name} className="list-row"><strong className="rank">{i + 1}</strong><span>{m.name} <small className="muted">· {m.university}</small></span><span className="right">{m.hours} h</span></div>
+            <div key={`${m.name}-${i}`} className="list-row"><strong className="rank">{i + 1}</strong><span>{m.name} <small className="muted">· {m.university}</small></span><span className="right">{m.hours} h</span></div>
           ))}
+          <p className="muted small">Solo se muestra el primer nombre de cada mentor.</p>
         </div>
       </Section>
     </div>

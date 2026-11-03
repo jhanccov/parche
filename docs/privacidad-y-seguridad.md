@@ -14,7 +14,8 @@
 - Validación de todas las entradas con Zod.
 - Acceso a cada chat verificado por pertenencia (comunidad, equipo o mentoría).
 - Consultas parametrizadas contra inyección SQL.
-- Indicadores de impacto solo agregados.
+- Indicadores de impacto solo agregados; el tablero de mentores muestra
+  únicamente el primer nombre y la universidad, nunca apellidos ni correos.
 
 ## Marco legal
 

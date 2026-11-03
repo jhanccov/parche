@@ -2,6 +2,7 @@ import { FormEvent, useEffect, useState } from 'react';
 import { Navigate, useNavigate } from 'react-router-dom';
 import { ShieldCheck } from 'lucide-react';
 import { api } from '../lib/api';
+import { setThemeColor } from '../lib/fx';
 import { useAuth } from '../lib/auth';
 import { Avatar, ErrorMsg } from '../components/ui';
 
@@ -20,18 +21,21 @@ export default function Login() {
   const [err, setErr] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
   const [demos, setDemos] = useState<Demo[]>([]);
+  const [demoMode, setDemoMode] = useState(false);
 
   const [verb, setVerb] = useState(0);
 
   useEffect(() => {
+    api<{ demo: boolean }>('/health').then((h) => setDemoMode(!!h.demo)).catch(() => {});
     api<Demo[]>('/auth/demo-users').then(setDemos).catch(() => {});
   }, []);
 
   useEffect(() => {
     document.body.classList.add('dark-page');
+    setThemeColor('dark');
     const reduce = window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
     const t = reduce ? undefined : setInterval(() => setVerb((v) => (v + 1) % VERBS.length), 2200);
-    return () => { document.body.classList.remove('dark-page'); if (t) clearInterval(t); };
+    return () => { document.body.classList.remove('dark-page'); setThemeColor('default'); if (t) clearInterval(t); };
   }, []);
 
   if (me) return <Navigate to="/" replace />;
@@ -97,7 +101,8 @@ export default function Login() {
           <form onSubmit={verify}>
             <label htmlFor="code">Código de 6 dígitos enviado a {email}</label>
             <input id="code" inputMode="numeric" maxLength={6} required value={code} onChange={(e) => setCode(e.target.value.replace(/\D/g, ''))} placeholder="000000" />
-            {devCode && <p className="hint">Modo demostración: tu código es <strong>{devCode}</strong></p>}
+            <p className="muted small">El código vence en 10 minutos y tienes 5 intentos.</p>
+            {demoMode && devCode && <p className="hint">Modo demostración: tu código es <strong>{devCode}</strong></p>}
             <ErrorMsg msg={err} />
             <button className="btn gold block" disabled={busy}>{busy ? 'Verificando...' : 'Entrar'}</button>
             <button type="button" className="btn ghost block" onClick={() => setStep('email')}>Cambiar correo</button>
@@ -105,7 +110,7 @@ export default function Login() {
         )}
       </div>
 
-      {demos.length > 0 && (
+      {demoMode && demos.length > 0 && (
         <div className="card login-card">
           <h3>Explora la demostración</h3>
           <p className="muted small">Entra como un estudiante de ejemplo para recorrer la app.</p>

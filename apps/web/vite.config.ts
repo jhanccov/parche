@@ -9,7 +9,7 @@ export default defineConfig({
       registerType: 'autoUpdate',
       includeAssets: ['logo.png', 'Nunito-ExtraBold.ttf'],
       manifest: {
-        name: 'Parche - Comunidades La Salle',
+        name: 'Parche · Comunidades La Salle',
         short_name: 'Parche',
         description: 'Comunidades, mentoría entre pares y retos del territorio para estudiantes La Salle de Colombia y Perú',
         lang: 'es',

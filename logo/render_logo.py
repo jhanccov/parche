@@ -54,6 +54,22 @@ def render(width_px, path, pad_ratio=0.12):
     img.save(path)
     print("ok:", path, img.size)
 
+def rounded_bg(size, radius_ratio=0.24):
+    img = Image.new("RGBA", (size, size), (0, 0, 0, 0))
+    d = ImageDraw.Draw(img)
+    d.rounded_rectangle([0, 0, size - 1, size - 1], radius=int(size * radius_ratio), fill=NAVY)
+    return img, d
+
+
+def render_icon(size, path, pad_ratio=0.22):
+    """Isotipo compacto: spark ámbar sobre rounded-square navy, con aire
+    suficiente para recorte maskable. Fuente de verdad de icon-*.png."""
+    img, d = rounded_bg(size)
+    spark(draw=d, cx=size / 2, cy=size / 2, r=size * (0.5 - pad_ratio) * 0.95, fill=AMBER)
+    img.save(path)
+    print("ok:", path, img.size)
+
+
 if __name__ == "__main__":
     render(1024, os.path.join(OUT, "logo-parche.png"))
     render(512, os.path.join(OUT, "logo-parche-512.png"))

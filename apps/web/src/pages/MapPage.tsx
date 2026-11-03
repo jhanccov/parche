@@ -116,7 +116,16 @@ export default function MapPage() {
           ))}
         </MapContainer>
       )}
-      <p className="map-note">El mapa muestra sedes, comunidades, eventos y retos. Nunca la ubicación de una persona.</p>
+      <p className="map-note">
+        <span className="legend" aria-label="Leyenda">
+          <i className="dot" style={{ background: '#033259' }} /> Sede
+          <i className="dot" style={{ background: '#2F7D5C' }} /> Rural
+          <i className="dot" style={{ background: '#F7A800' }} /> Evento
+          <i className="dot" style={{ background: '#B07A00' }} /> Reto
+          <i className="dot" style={{ background: '#6B4C9A' }} /> Ayuda
+        </span>
+        <span>Ubicaciones aproximadas. Nunca la ubicación de una persona.</span>
+      </p>
     </div>
   );
 }
