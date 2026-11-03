@@ -1,15 +1,14 @@
 import { useEffect, useState } from 'react';
 import { NavLink, Link, Outlet, useLocation } from 'react-router-dom';
-import { Home, Map, Users, HandHelping, Mountain, Plus, X, Sparkles, Share2 } from 'lucide-react';
+import { Home, Map, Users, HandHelping, Mountain, Plus, Sparkles, Share2 } from 'lucide-react';
 import { useAuth } from '../lib/auth';
 import { shareLink } from '../lib/fx';
 import { Avatar } from './ui';
 
-const LEFT = [
+const TABS = [
   { to: '/', label: 'Inicio', icon: Home, end: true },
   { to: '/comunidades', label: 'Comunidades', icon: Users },
-];
-const RIGHT = [
+  { to: '/mapa', label: 'Mapa', icon: Map },
   { to: '/mentoria', label: 'Mentoría', icon: HandHelping },
   { to: '/retos', label: 'Retos', icon: Mountain },
 ];
@@ -20,13 +19,6 @@ export default function Layout() {
   const loc = useLocation();
   useEffect(() => setOpen(false), [loc.pathname]);
 
-  const tab = ({ to, label, icon: Icon, end }: (typeof LEFT)[number] & { end?: boolean }) => (
-    <NavLink key={to} to={to} end={end} className={({ isActive }) => (isActive ? 'on' : '')}>
-      <Icon size={22} />
-      <span>{label}</span>
-    </NavLink>
-  );
-
   return (
     <div className="shell">
       <header className="topbar">
@@ -34,8 +26,12 @@ export default function Layout() {
           <span className="wordmark">parche<i aria-hidden>✦</i></span>
         </Link>
         <div className="topbar-right">
-          <Link to="/mapa" className="icon-btn" aria-label="Mapa de la red"><Map size={19} /></Link>
-          <Link to="/impacto" className="icon-btn" aria-label="Impacto de la red"><Sparkles size={19} /></Link>
+          <Link to="/impacto" className="pill gold topbar-impact" aria-label="Impacto de la red">
+            <Sparkles size={14} /><span>Impacto</span>
+          </Link>
+          <button className="icon-btn gold" onClick={() => setOpen(true)} aria-label="Crear" aria-expanded={open}>
+            <Plus size={20} />
+          </button>
           <Link to="/perfil" className="pts" title="Tus puntos">✦ {me?.points ?? 0}</Link>
           <Link to="/perfil" aria-label="Tu perfil">
             <Avatar name={me?.name} size={36} />
@@ -55,11 +51,12 @@ export default function Layout() {
       </div>
 
       <nav className="tabbar" aria-label="Navegación principal">
-        {LEFT.map(tab)}
-        <button className={`fab ${open ? 'open' : ''}`} onClick={() => setOpen(!open)} aria-label={open ? 'Cerrar' : 'Crear'} aria-expanded={open}>
-          {open ? <X size={26} /> : <Plus size={28} />}
-        </button>
-        {RIGHT.map(tab)}
+        {TABS.map(({ to, label, icon: Icon, end }) => (
+          <NavLink key={to} to={to} end={end} className={({ isActive }) => (isActive ? 'on' : '')}>
+            <Icon size={22} />
+            <span>{label}</span>
+          </NavLink>
+        ))}
       </nav>
     </div>
   );

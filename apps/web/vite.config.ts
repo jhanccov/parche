@@ -11,6 +11,8 @@ export default defineConfig({
       manifest: {
         name: 'Parche · Comunidades La Salle',
         short_name: 'Parche',
+        id: '/',
+        scope: '/',
         description: 'Comunidades, mentoría entre pares y retos del territorio para estudiantes La Salle de Colombia y Perú',
         lang: 'es',
         theme_color: '#033259',
@@ -20,6 +22,13 @@ export default defineConfig({
         icons: [
           { src: '/icon-192.png', sizes: '192x192', type: 'image/png' },
           { src: '/icon-512.png', sizes: '512x512', type: 'image/png', purpose: 'any maskable' },
+        ],
+        screenshots: [
+          { src: '/img/cat-territorio.jpg', sizes: '800x268', type: 'image/jpeg', form_factor: 'wide', label: 'Retos del territorio' },
+          { src: '/img/ayuda-mentoria.jpg', sizes: '800x533', type: 'image/jpeg', form_factor: 'narrow', label: 'Mentoría entre pares' },
+        ],
+        shortcuts: [
+          { name: 'Pedir ayuda', short_name: 'Ayuda', description: 'Pide ayuda y le llega a quien sabe del tema', url: '/mentoria/nueva', icons: [{ src: '/icon-192.png', sizes: '192x192' }] },
         ],
       },
       workbox: {

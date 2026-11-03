@@ -14,8 +14,18 @@ export default async function challengeRoutes(app: FastifyInstance) {
   app.addHook('preHandler', app.auth);
 
   app.get('/', async (req) => {
-    const { country } = z.object({ country: z.string().optional() }).parse(req.query);
-    return country ? q(`${list} where ch.country = $1 order by ch.created_at desc`, [country]) : q(`${list} order by ch.created_at desc`);
+    const { country, ods, status } = z.object({
+      country: z.string().optional(),
+      ods: z.coerce.number().int().min(1).max(17).optional(),
+      status: z.enum(['abierto', 'en_progreso', 'resuelto']).optional(),
+    }).parse(req.query);
+    return q(
+      `${list} where ($1::text is null or ch.country = $1)
+        and ($2::int is null or $2 = any(ch.ods))
+        and ($3::text is null or ch.status = $3)
+       order by ch.created_at desc`,
+      [country ?? null, ods ?? null, status ?? null],
+    );
   });
 
   app.get('/:id', async (req) => {

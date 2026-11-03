@@ -1,11 +1,25 @@
+import { useState } from 'react';
 import { Link } from 'react-router-dom';
+import { api } from '../lib/api';
 import { useApi } from '../lib/useApi';
 import { Loading } from '../components/ui';
 
 export default function Certificate() {
   const { data } = useApi<any>('/me/certificate');
+  const [copied, setCopied] = useState(false);
   if (!data) return <Loading />;
   const u = data.user;
+
+  async function copyFolio() {
+    try {
+      await navigator.clipboard.writeText(data.folio);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    } catch {
+      /* portapapeles no disponible */
+    }
+  }
+
   return (
     <div className="certificate">
       <div className="no-print row gap">
@@ -30,6 +44,10 @@ export default function Certificate() {
           <p>Además participa en los retos del territorio: {data.teams.map((t: any) => `${t.challenge} (${t.territory}, equipo ${t.team})`).join('; ')}.</p>
         )}
         <p className="muted small">Cada hora fue confirmada por el estudiante que recibió la ayuda. Emitida el {new Date(data.issuedAt).toLocaleDateString('es-CO')}. Puede validarse ante Bienestar Universitario o Responsabilidad Social.</p>
+        <p className="folio">
+          Folio <strong>{data.folio}</strong>
+          <button type="button" className="btn small ghost no-print" onClick={copyFolio}>{copied ? 'Copiado' : 'Copiar folio'}</button>
+        </p>
       </div>
     </div>
   );
