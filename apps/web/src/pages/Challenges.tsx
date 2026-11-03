@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { MapPin, Users } from 'lucide-react';
 import { useApi } from '../lib/useApi';
-import { flag } from '../lib/format';
+import { flag, ODS } from '../lib/format';
 import { Chip, Empty, Loading } from '../components/ui';
 
 export function ChallengeCard({ c }: { c: any }) {
@@ -24,7 +24,14 @@ export function ChallengeCard({ c }: { c: any }) {
 
 export default function Challenges() {
   const [country, setCountry] = useState('');
-  const { data, loading } = useApi<any[]>(`/challenges${country ? `?country=${encodeURIComponent(country)}` : ''}`);
+  const [ods, setOds] = useState('');
+  const [status, setStatus] = useState('');
+  const qs = [
+    country && `country=${encodeURIComponent(country)}`,
+    ods && `ods=${ods}`,
+    status && `status=${status}`,
+  ].filter(Boolean).join('&');
+  const { data, loading } = useApi<any[]>(`/challenges${qs ? `?${qs}` : ''}`);
   return (
     <div className="page">
       <h1>Retos del territorio</h1>
@@ -34,7 +41,18 @@ export default function Challenges() {
         <button className={country === 'Colombia' ? 'on' : ''} onClick={() => setCountry('Colombia')}>🇨🇴 Colombia</button>
         <button className={country === 'Perú' ? 'on' : ''} onClick={() => setCountry('Perú')}>🇵🇪 Perú</button>
       </div>
-      {loading ? <Loading /> : data?.length ? data.map((c) => <ChallengeCard key={c.id} c={c} />) : <Empty title="No hay retos aún" />}
+      <div className="filters">
+        <button className={!status ? 'on' : ''} onClick={() => setStatus('')}>Cualquier estado</button>
+        <button className={status === 'abierto' ? 'on' : ''} onClick={() => setStatus('abierto')}>Buscan equipo</button>
+        <button className={status === 'en_progreso' ? 'on' : ''} onClick={() => setStatus('en_progreso')}>En progreso</button>
+      </div>
+      <label className="small">Objetivo de desarrollo
+        <select value={ods} onChange={(e) => setOds(e.target.value)}>
+          <option value="">Todos los ODS</option>
+          {Object.entries(ODS).map(([n, label]) => <option key={n} value={n}>ODS {n} · {label}</option>)}
+        </select>
+      </label>
+      {loading ? <Loading /> : data?.length ? data.map((c) => <ChallengeCard key={c.id} c={c} />) : <Empty title="No hay retos con esos filtros" />}
     </div>
   );
 }

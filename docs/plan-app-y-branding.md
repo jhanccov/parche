@@ -37,15 +37,15 @@ App:
 
 ## P1 — Durante el piloto
 
-- [ ] Navegación: sacar Mapa e Impacto de los iconos sin etiqueta del topbar;
+- [x] Navegación: sacar Mapa e Impacto de los iconos sin etiqueta del topbar;
       5 tabs etiquetados + acceso visible a Mapa e Impacto.
-- [ ] Mentoría: cierre como checklist visible
+- [x] Mentoría: cierre como checklist visible
       ("1. Acepta · 2. Chatea · 3. Confirma horas + calificación").
-- [ ] Retos: filtros por ODS y por estado.
-- [ ] Constancia: folio/QR verificable (hoy es una tabla falsificable).
-- [ ] `docs/marca.md`: tokens (colores, tipografía, tracking), escala y reglas
+- [x] Retos: filtros por ODS y por estado.
+- [x] Constancia: folio/QR verificable (hoy es una tabla falsificable).
+- [x] `docs/marca.md`: tokens (colores, tipografía, tracking), escala y reglas
       de uso del isotipo/wordmark.
-- [ ] PWA: `scope`, `id`, 2 screenshots y shortcut a `/mentoria/nueva`.
+- [x] PWA: `scope`, `id`, 2 screenshots y shortcut a `/mentoria/nueva`.
 
 ## P2 — Post-piloto
 

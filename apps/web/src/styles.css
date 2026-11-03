@@ -94,12 +94,10 @@ legend small { color: var(--muted); font-weight: 400; }
 .tabbar a { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 3px; color: #7F97B2; font-size: 11px; font-weight: 700; padding: 4px 2px; }
 .tabbar a.on { color: #fff; }
 .tabbar a.on svg { color: var(--sun); filter: drop-shadow(0 0 8px rgba(255,184,0,0.6)); }
-.fab {
-  width: 60px; height: 60px; border: 3px solid var(--night); border-radius: 50%; margin: -26px 4px 0; display: grid; place-items: center; color: var(--night); flex: 0 0 auto;
-  background: radial-gradient(circle at 30% 25%, #FFE08A, var(--sun) 55%, #FF8A00); box-shadow: 0 0 0 3px rgba(255,184,0,0.25), 0 10px 24px rgba(255,138,0,0.45);
-  transition: transform .3s cubic-bezier(.3,1.6,.5,1);
+@media (max-width: 420px) {
+  .topbar-impact span { display: none; }
+  .wordmark { font-size: 24px; }
 }
-.fab.open { transform: rotate(90deg); }
 .sheet-backdrop { position: fixed; inset: 0; z-index: 930; background: rgba(3, 10, 22, 0.55); border: 0; backdrop-filter: blur(3px); }
 .sheet {
   position: fixed; left: 0; right: 0; bottom: 0; z-index: 940; max-width: 760px; margin: 0 auto; padding: 18px 16px calc(100px + env(safe-area-inset-bottom));
@@ -276,6 +274,7 @@ legend small { color: var(--muted); font-weight: 400; }
 .leaflet-popup-content a { color: var(--navy2); font-weight: 700; }
 
 .certificate { max-width: 800px; margin: 0 auto; padding: 24px 16px; }
+.folio { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; background: var(--gold-soft); border-radius: 12px; padding: 10px 12px; }
 .cert-sheet { background: #fff; border: 3px solid var(--gold); border-radius: 18px; padding: 36px; margin-top: 16px; }
 .cert-logo { height: 44px; }
 .cert-sheet table { width: 100%; border-collapse: collapse; margin: 16px 0; font-size: 14px; }

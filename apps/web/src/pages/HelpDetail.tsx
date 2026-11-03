@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { Star } from 'lucide-react';
+import { Check, Circle, Star } from 'lucide-react';
 import { api } from '../lib/api';
 import { useAuth } from '../lib/auth';
 import { useApi } from '../lib/useApi';
@@ -20,6 +20,11 @@ export default function HelpDetail() {
   if (loading || !h) return <Loading />;
   const mine = h.author_id === me?.id;
   const isMentor = h.mentor_id === me?.id;
+  const steps = [
+    { label: '1. Alguien acepta ayudar', done: !!h.mentor_id },
+    { label: '2. Coordinan por el chat', done: !!h.mentor_id },
+    { label: '3. Cierran con horas y calificación', done: h.status === 'resuelta' },
+  ];
 
   async function act(path: string, body: unknown = {}, method = 'POST') {
     setErr(null);
@@ -60,6 +65,19 @@ export default function HelpDetail() {
           {!mine && <button className="link small" onClick={report}>Reportar</button>}
         </div>
       </div>
+
+      {h.status !== 'resuelta' && (
+        <Section title="Cómo funciona">
+          <ul className="checklist card">
+            {steps.map((s) => (
+              <li key={s.label} className={s.done ? 'done' : ''}>
+                {s.done ? <Check size={18} /> : <Circle size={18} />}
+                {s.label}
+              </li>
+            ))}
+          </ul>
+        </Section>
+      )}
 
       {h.status === 'en_curso' && mine && (
         <Section title="¿Te ayudaron? Cierra la mentoría">

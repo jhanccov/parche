@@ -1,7 +1,9 @@
 import { FastifyInstance } from 'fastify';
+import { createHmac, timingSafeEqual } from 'node:crypto';
 import { z } from 'zod';
 import { getUser, HttpError } from '../app.js';
 import { one, q } from '../db.js';
+import { config } from '../config.js';
 import { badges, totalPoints } from '../points.js';
 
 const perfil = z.object({
@@ -58,6 +60,33 @@ export default async function meRoutes(app: FastifyInstance) {
       [req.user.sub],
     );
     const total = sessions.reduce((s: number, r: any) => s + Number(r.hours ?? 0), 0);
-    return { user: u, sessions, teams, totalHours: total, issuedAt: new Date().toISOString() };
+    return { user: u, sessions, teams, totalHours: total, issuedAt: new Date().toISOString(), folio: folioFor(req.user.sub, total) };
   });
+
+  app.get('/certificate/verify/:folio', async (req) => {
+    const { folio } = z.object({ folio: z.string() }).parse(req.params);
+    const v = verifyFolio(folio);
+    if (!v) throw new HttpError(404, 'Folio no válido');
+    return v;
+  });
+}
+
+export function folioFor(userId: string, totalHours: number) {
+  const payload = Buffer.from(JSON.stringify({ u: userId, h: totalHours })).toString('base64url');
+  const sig = createHmac('sha256', config.jwtSecret).update(payload).digest('base64url').slice(0, 16);
+  return `PCH-${payload}.${sig}`;
+}
+
+function verifyFolio(folio: string) {
+  const m = /^PCH-([A-Za-z0-9_-]+)\.([A-Za-z0-9_-]{16})$/.exec(folio);
+  if (!m) return null;
+  const [, payload, sig] = m;
+  const expect = createHmac('sha256', config.jwtSecret).update(payload).digest('base64url').slice(0, 16);
+  if (sig.length !== expect.length || !timingSafeEqual(Buffer.from(sig), Buffer.from(expect))) return null;
+  try {
+    const { u, h } = JSON.parse(Buffer.from(payload, 'base64url').toString());
+    return { ok: true, userId: u, totalHours: h };
+  } catch {
+    return null;
+  }
 }
