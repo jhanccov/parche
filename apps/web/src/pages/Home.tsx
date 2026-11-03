@@ -9,23 +9,22 @@ import { burst, setThemeColor, shareLink } from '../lib/fx';
 
 const PROMPTS = ['¿Qué aprendemos hoy?', 'Tu parche te está esperando', 'Ayuda a alguien y suma puntos', 'Arma equipo para un reto real'];
 
-const TOPIC_EMOJI: Record<string, string> = {
-  'Cálculo': '∫', 'Álgebra lineal': '📐', 'Física': '🧲', 'Química': '⚗️', 'Estadística': '📊', 'Programación': '👩‍💻',
-  'Python': '🐍', 'Java': '☕', 'C++': '⚙️', 'Bases de datos': '🗄️', 'Desarrollo web': '🌐', 'Apps móviles': '📱',
-  'Cloud (AWS)': '☁️', 'Inteligencia artificial': '🤖', 'Inglés': '🗣️', 'Redacción': '✍️',
-};
+// Foto sobre degradado: la imagen manda, el overlay garantiza lectura.
+// Si la foto falla, queda el navy de fondo y el texto sigue legible.
+const photo = (img?: string, overlay = 'linear-gradient(180deg, rgba(3,20,35,0) 35%, rgba(3,20,35,0.72))') =>
+  img ? { backgroundColor: '#0B2A4B', backgroundImage: `${overlay}, url(${img})` } as const : {};
 
 type Item =
   | { kind: 'event'; key: string; d: any }
   | { kind: 'community'; key: string; d: any }
   | { kind: 'help'; key: string; d: any }
   | { kind: 'challenge'; key: string; d: any }
-  | { kind: 'invite'; key: string; d: { emoji: string; title: string; text: string; cta: string; to?: string; share?: boolean; grad: string } };
+  | { kind: 'invite'; key: string; d: { title: string; text: string; cta: string; to?: string; share?: boolean; img: string } };
 
 const INVITES: Item[] = [
-  { kind: 'invite', key: 'inv-crear', d: { emoji: '🚀', title: 'Crea el parche de tu carrera', text: 'Un club, un semillero o un grupo de estudio. Te guiamos paso a paso hasta que esté activo.', cta: 'Crear comunidad', to: '/comunidades/nueva', grad: 'linear-gradient(160deg,#FFB800 0%,#FF4D8D 55%,#5B1A9E 100%)' } },
-  { kind: 'invite', key: 'inv-ayuda', d: { emoji: '🆘', title: '¿Te trabaste en un curso?', text: 'Pide ayuda y le llega a quien domina el tema, en tu sede o en otro país.', cta: 'Pedir ayuda', to: '/mentoria/nueva', grad: 'linear-gradient(160deg,#18C6B3 0%,#1E5BFF 60%,#0B1F4D 100%)' } },
-  { kind: 'invite', key: 'inv-share', d: { emoji: '📲', title: 'Trae a tu salón', text: 'Mientras más compañeros entren, más rápido encuentras ayuda y equipo.', cta: 'Compartir Parche', share: true, grad: 'linear-gradient(160deg,#FF4D8D 0%,#7C3AED 60%,#1A0B3A 100%)' } },
+  { kind: 'invite', key: 'inv-crear', d: { title: 'Crea el parche de tu carrera', text: 'Un club, un semillero o un grupo de estudio. Te guiamos paso a paso hasta que esté activo.', cta: 'Crear comunidad', to: '/comunidades/nueva', img: '/img/invite-crear.jpg' } },
+  { kind: 'invite', key: 'inv-ayuda', d: { title: '¿Te trabaste en un curso?', text: 'Pide ayuda y le llega a quien domina el tema, en tu sede o en otro país.', cta: 'Pedir ayuda', to: '/mentoria/nueva', img: '/img/invite-ayuda.jpg' } },
+  { kind: 'invite', key: 'inv-share', d: { title: 'Trae a tu salón', text: 'Mientras más compañeros entren, más rápido encuentras ayuda y equipo.', cta: 'Compartir Parche', share: true, img: '/img/invite-compartir.jpg' } },
 ];
 
 function mix(lists: Item[][]) {
@@ -139,7 +138,7 @@ export default function Home() {
           return (
             <Link to={`/comunidades/${c.id}`} key={c.id} className="story">
               <span className={`story-ring ${c.joined ? 'mine' : ''}`}>
-                <span className="story-in" style={{ background: cat?.grad }}>{cat?.emoji ?? '👥'}</span>
+                <span className="story-in" style={cat?.img ? { backgroundImage: `url(${cat.img})` } : { background: cat?.grad }} aria-hidden />
               </span>
               <span className="story-name">{c.name}</span>
             </Link>
@@ -155,9 +154,8 @@ export default function Home() {
             const d = it.d; const cat = CATEGORIES[d.category];
             const to = d.community_id ? `/comunidades/${d.community_id}` : '/';
             return (
-              <article key={it.key} className="fcard" style={{ background: cat?.grad ?? CATEGORIES.tecnologia.grad }}>
+              <article key={it.key} className="fcard" style={{ background: cat?.grad ?? CATEGORIES.tecnologia.grad, ...photo(cat?.img) }}>
                 <span className="fbadge"><CalendarDays size={14} /> Evento</span>
-                <span className="fart" aria-hidden>{cat?.emoji ?? '📅'}</span>
                 <div className="fbody">
                   <h3><Link to={to}>{d.title}</Link></h3>
                   <p className="fmeta">{when(d.starts_at)}</p>
@@ -177,9 +175,8 @@ export default function Home() {
             const d = it.d; const cat = CATEGORIES[d.category];
             const pct = Math.min(100, Math.round((d.members / Math.max(1, d.goal_members)) * 100));
             return (
-              <article key={it.key} className="fcard" style={{ background: cat?.grad }}>
+              <article key={it.key} className="fcard" style={{ background: cat?.grad, ...photo(cat?.img) }}>
                 <span className="fbadge"><Users size={14} /> Comunidad · {cat?.label}</span>
-                <span className="fart" aria-hidden>{cat?.emoji ?? '👥'}</span>
                 <div className="fbody">
                   <h3><Link to={`/comunidades/${d.id}`}>{d.name}</Link></h3>
                   <p className="fdesc">{d.description}</p>
@@ -199,9 +196,8 @@ export default function Home() {
           if (it.kind === 'help') {
             const d = it.d;
             return (
-              <article key={it.key} className="fcard" style={{ background: 'linear-gradient(160deg,#FF8A00 0%,#E5397A 55%,#3A0B2E 100%)' }}>
+              <article key={it.key} className="fcard" style={{ ...photo('/img/ayuda-mentoria.jpg') }}>
                 <span className="fbadge"><HandHelping size={14} /> Pide ayuda en {d.topic}</span>
-                <span className="fart" aria-hidden>{TOPIC_EMOJI[d.topic] ?? '💡'}</span>
                 <div className="fbody">
                   <h3><Link to={`/mentoria/${d.id}`}>{d.title}</Link></h3>
                   {d.detail && <p className="fdesc">{d.detail}</p>}
@@ -218,9 +214,8 @@ export default function Home() {
           if (it.kind === 'challenge') {
             const d = it.d;
             return (
-              <article key={it.key} className="fcard" style={{ background: CATEGORIES.territorio.grad }}>
+              <article key={it.key} className="fcard" style={{ background: CATEGORIES.territorio.grad, ...photo(CATEGORIES.territorio.img) }}>
                 <span className="fbadge"><Mountain size={14} /> Reto del territorio</span>
-                <span className="fart" aria-hidden>🏔️</span>
                 <div className="fbody">
                   <p className="fmeta">{flag(d.country)} {d.territory}</p>
                   <h3><Link to={`/retos/${d.id}`}>{d.title}</Link></h3>
@@ -238,7 +233,6 @@ export default function Home() {
           const d = it.d;
           const inner = (
             <>
-              <span className="fart big" aria-hidden>{d.emoji}</span>
               <div className="fbody">
                 <h3 className="xl">{d.title}</h3>
                 <p className="fdesc">{d.text}</p>
@@ -247,9 +241,9 @@ export default function Home() {
             </>
           );
           return d.share ? (
-            <button key={it.key} className="fcard invite" style={{ background: d.grad }} onClick={(e) => share(e, 'Únete a mi parche')}>{inner}</button>
+            <button key={it.key} className="fcard invite" style={photo(d.img)} onClick={(e) => share(e, 'Únete a mi parche')}>{inner}</button>
           ) : (
-            <Link key={it.key} to={d.to!} className="fcard invite" style={{ background: d.grad }}>{inner}</Link>
+            <Link key={it.key} to={d.to!} className="fcard invite" style={photo(d.img)}>{inner}</Link>
           );
         })}
       </div>
