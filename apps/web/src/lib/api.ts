@@ -23,7 +23,7 @@ export class ApiError extends Error {
   }
 }
 
-export async function api<T = any>(path: string, opts: { method?: string; body?: unknown } = {}): Promise<T> {
+export async function api<T = any>(path: string, opts: { method?: string; body?: unknown; signal?: AbortSignal } = {}): Promise<T> {
   const token = getToken();
   const res = await fetch(`/api${path}`, {
     method: opts.method ?? (opts.body ? 'POST' : 'GET'),
@@ -32,6 +32,7 @@ export async function api<T = any>(path: string, opts: { method?: string; body?:
       ...(token ? { authorization: `Bearer ${token}` } : {}),
     },
     body: opts.body !== undefined ? JSON.stringify(opts.body) : undefined,
+    signal: opts.signal,
   });
   const data = await res.json().catch(() => ({}));
   if (!res.ok) {

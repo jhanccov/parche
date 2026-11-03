@@ -2,6 +2,23 @@ const COLORS = ['#FFB800', '#18C6B3', '#FF4D8D', '#FFFFFF', '#5AA9FF'];
 
 export const APP_URL = typeof window !== 'undefined' ? window.location.origin : '';
 
+const THEME_DEFAULT = '#033259';
+const THEME_DARK = '#06162B';
+
+/** Mantiene el theme-color del navegador alineado con el fondo real
+ *  (las páginas oscuras usan night, no navy) para evitar el flash. */
+export function setThemeColor(mode: 'dark' | 'default') {
+  if (typeof document === 'undefined') return;
+  const color = mode === 'dark' ? THEME_DARK : THEME_DEFAULT;
+  let meta = document.querySelector<HTMLMetaElement>('meta[name="theme-color"]');
+  if (!meta) {
+    meta = document.createElement('meta');
+    meta.name = 'theme-color';
+    document.head.appendChild(meta);
+  }
+  meta.content = color;
+}
+
 export function burst(el?: Element | null) {
   if (typeof window === 'undefined') return;
   if (window.matchMedia?.('(prefers-reduced-motion: reduce)').matches) return;

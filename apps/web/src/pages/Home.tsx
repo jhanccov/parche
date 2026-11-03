@@ -5,7 +5,7 @@ import { useAuth } from '../lib/auth';
 import { useApi } from '../lib/useApi';
 import { api } from '../lib/api';
 import { CATEGORIES, flag, when } from '../lib/format';
-import { burst, shareLink } from '../lib/fx';
+import { burst, setThemeColor, shareLink } from '../lib/fx';
 
 const PROMPTS = ['¿Qué aprendemos hoy?', 'Tu parche te está esperando', 'Ayuda a alguien y suma puntos', 'Arma equipo para un reto real'];
 
@@ -47,7 +47,8 @@ export default function Home() {
 
   useEffect(() => {
     document.body.classList.add('dark-page');
-    return () => document.body.classList.remove('dark-page');
+    setThemeColor('dark');
+    return () => { document.body.classList.remove('dark-page'); setThemeColor('default'); };
   }, []);
 
   useEffect(() => {
@@ -82,21 +83,22 @@ export default function Home() {
   }, [events.data, comms.data, help.data, challenges.data, me?.id]);
 
   async function share(e: MouseEvent, title: string, path = '/') {
-    e.preventDefault();
     const r = await shareLink(title, path);
     if (r === 'copied') setToast('Enlace copiado');
   }
 
   async function rsvp(e: MouseEvent, d: any) {
-    e.preventDefault();
-    const btn = e.currentTarget;
-    const r = await api<{ rsvp: boolean }>(`/events/${d.id}/rsvp`, { method: 'POST' });
-    if (r.rsvp) burst(btn);
-    events.setData((list) => (list ?? []).map((x) => (x.id === d.id ? { ...x, rsvp: r.rsvp, going: x.going + (r.rsvp ? 1 : -1) } : x)));
+    try {
+      const btn = e.currentTarget;
+      const r = await api<{ rsvp: boolean }>(`/events/${d.id}/rsvp`, { method: 'POST' });
+      if (r.rsvp) burst(btn);
+      events.setData((list) => (list ?? []).map((x) => (x.id === d.id ? { ...x, rsvp: r.rsvp, going: x.going + (r.rsvp ? 1 : -1) } : x)));
+    } catch (err: any) {
+      if (err?.name !== 'AbortError') setToast(err.message);
+    }
   }
 
   async function join(e: MouseEvent, d: any) {
-    e.preventDefault();
     const btn = e.currentTarget;
     try {
       await api(`/communities/${d.id}/join`, { method: 'POST' });
@@ -109,7 +111,6 @@ export default function Home() {
   }
 
   async function offer(e: MouseEvent, d: any) {
-    e.preventDefault();
     try {
       await api(`/help/${d.id}/offer`, { method: 'POST' });
       burst(e.currentTarget);
@@ -152,12 +153,13 @@ export default function Home() {
         {feed.map((it) => {
           if (it.kind === 'event') {
             const d = it.d; const cat = CATEGORIES[d.category];
+            const to = d.community_id ? `/comunidades/${d.community_id}` : '/';
             return (
-              <Link key={it.key} to={d.community_id ? `/comunidades/${d.community_id}` : '/'} className="fcard" style={{ background: cat?.grad ?? CATEGORIES.tecnologia.grad }}>
+              <article key={it.key} className="fcard" style={{ background: cat?.grad ?? CATEGORIES.tecnologia.grad }}>
                 <span className="fbadge"><CalendarDays size={14} /> Evento</span>
                 <span className="fart" aria-hidden>{cat?.emoji ?? '📅'}</span>
                 <div className="fbody">
-                  <h3>{d.title}</h3>
+                  <h3><Link to={to}>{d.title}</Link></h3>
                   <p className="fmeta">{when(d.starts_at)}</p>
                   <p className="fmeta"><MapPin size={14} /> {d.place || 'Lugar por definir'}{d.community ? ` · ${d.community}` : ''}</p>
                 </div>
@@ -168,18 +170,18 @@ export default function Home() {
                   <span className="fcount">{d.going}<small>van</small></span>
                   <button className="fbtn" onClick={(e) => share(e, d.title)} aria-label="Compartir"><Share2 size={24} /></button>
                 </div>
-              </Link>
+              </article>
             );
           }
           if (it.kind === 'community') {
             const d = it.d; const cat = CATEGORIES[d.category];
             const pct = Math.min(100, Math.round((d.members / Math.max(1, d.goal_members)) * 100));
             return (
-              <Link key={it.key} to={`/comunidades/${d.id}`} className="fcard" style={{ background: cat?.grad }}>
+              <article key={it.key} className="fcard" style={{ background: cat?.grad }}>
                 <span className="fbadge"><Users size={14} /> Comunidad · {cat?.label}</span>
                 <span className="fart" aria-hidden>{cat?.emoji ?? '👥'}</span>
                 <div className="fbody">
-                  <h3>{d.name}</h3>
+                  <h3><Link to={`/comunidades/${d.id}`}>{d.name}</Link></h3>
                   <p className="fdesc">{d.description}</p>
                   <div className="fbar"><span style={{ width: `${Math.max(6, pct)}%` }} /></div>
                   <p className="fmeta">{d.members} de {d.goal_members} miembros · {d.university}</p>
@@ -191,17 +193,17 @@ export default function Home() {
                   <span className="fcount">{d.joined ? 'Dentro' : 'Unirme'}</span>
                   <button className="fbtn" onClick={(e) => share(e, d.name, `/comunidades/${d.id}`)} aria-label="Compartir"><Share2 size={24} /></button>
                 </div>
-              </Link>
+              </article>
             );
           }
           if (it.kind === 'help') {
             const d = it.d;
             return (
-              <Link key={it.key} to={`/mentoria/${d.id}`} className="fcard" style={{ background: 'linear-gradient(160deg,#FF8A00 0%,#E5397A 55%,#3A0B2E 100%)' }}>
+              <article key={it.key} className="fcard" style={{ background: 'linear-gradient(160deg,#FF8A00 0%,#E5397A 55%,#3A0B2E 100%)' }}>
                 <span className="fbadge"><HandHelping size={14} /> Pide ayuda en {d.topic}</span>
                 <span className="fart" aria-hidden>{TOPIC_EMOJI[d.topic] ?? '💡'}</span>
                 <div className="fbody">
-                  <h3>{d.title}</h3>
+                  <h3><Link to={`/mentoria/${d.id}`}>{d.title}</Link></h3>
                   {d.detail && <p className="fdesc">{d.detail}</p>}
                   <p className="fmeta">{d.author?.split(' ')[0]} · {d.author_career} · {d.author_university}</p>
                 </div>
@@ -210,27 +212,27 @@ export default function Home() {
                   <span className="fcount">Ayudo</span>
                   <button className="fbtn" onClick={(e) => share(e, `Alguien necesita ayuda en ${d.topic}`)} aria-label="Compartir"><Share2 size={24} /></button>
                 </div>
-              </Link>
+              </article>
             );
           }
           if (it.kind === 'challenge') {
             const d = it.d;
             return (
-              <Link key={it.key} to={`/retos/${d.id}`} className="fcard" style={{ background: CATEGORIES.territorio.grad }}>
+              <article key={it.key} className="fcard" style={{ background: CATEGORIES.territorio.grad }}>
                 <span className="fbadge"><Mountain size={14} /> Reto del territorio</span>
                 <span className="fart" aria-hidden>🏔️</span>
                 <div className="fbody">
                   <p className="fmeta">{flag(d.country)} {d.territory}</p>
-                  <h3>{d.title}</h3>
+                  <h3><Link to={`/retos/${d.id}`}>{d.title}</Link></h3>
                   <p className="fdesc">{d.summary}</p>
                   <p className="fmeta">{d.participants ? `${d.participants} estudiantes en ${d.teams} equipos` : 'Aún sin equipo, puedes ser el primero'}</p>
                 </div>
                 <div className="frail">
-                  <span className="fbtn gold" aria-hidden><Mountain size={26} /></span>
+                  <Link className="fbtn gold" to={`/retos/${d.id}`} aria-label="Ver reto"><Mountain size={26} /></Link>
                   <span className="fcount">Ver reto</span>
                   <button className="fbtn" onClick={(e) => share(e, d.title, `/retos/${d.id}`)} aria-label="Compartir"><Share2 size={24} /></button>
                 </div>
-              </Link>
+              </article>
             );
           }
           const d = it.d;

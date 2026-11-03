@@ -31,7 +31,7 @@ export default async function impactRoutes(app: FastifyInstance) {
       select topic, count(*)::int as requests, count(*) filter (where status = 'resuelta')::int as solved
         from help_requests group by topic order by requests desc limit 8`);
     const topMentors = await q(`
-      select u.name, un.short_name as university, coalesce(sum(h.hours), 0)::float as hours, count(*)::int as sessions
+      select split_part(u.name, ' ', 1) as name, un.short_name as university, coalesce(sum(h.hours), 0)::float as hours, count(*)::int as sessions
         from help_requests h join users u on u.id = h.mentor_id left join universities un on un.id = u.university_id
        where h.status = 'resuelta' group by u.id, un.short_name order by hours desc limit 5`);
     return { totals, byUniversity, topics, topMentors };
