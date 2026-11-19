@@ -2,7 +2,7 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 import * as THREE from 'three';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
-import { BookOpen, CalendarDays, ChevronLeft, ChevronRight, Coffee, Eye, Footprints, GraduationCap, Home as HomeIcon, MapPin, Mountain, Music2, TreePine, X } from 'lucide-react';
+import { BookOpen, CalendarDays, DoorOpen, ChevronLeft, ChevronRight, Coffee, Eye, Footprints, GraduationCap, Home as HomeIcon, MapPin, Mountain, Music2, TreePine, X } from 'lucide-react';
 import { useApi } from '../lib/useApi';
 import { when } from '../lib/format';
 
@@ -14,6 +14,14 @@ type Place = {
 };
 
 const PLACES: Place[] = [
+  { id: 'frontis', name: 'Frontis e ingreso', icon: DoorOpen, pos: [-34, 15, 56], cam: [-12, 16, 104],
+    text: 'La entrada principal de ULASALLE: el muro rojo con el logo, las columnas azules y el "¡Bienvenidos!". Aquí empieza tu recorrido por el campus.',
+    photo: '/img/campus-frontis.jpg', keywords: ['frontis', 'ingreso', 'entrada', 'recepcion', 'recepción'],
+    actions: [{ label: 'Ver comunidades', to: '/comunidades' }, { label: 'Pedir ayuda', to: '/mentoria/nueva' }] },
+  { id: 'puerta', name: 'Puerta 517', icon: MapPin, pos: [44, 10, 58], cam: [64, 14, 100],
+    text: 'El ingreso por la Av. Alfonso Ugarte 517, con el mural de los volcanes hecho en piedra.',
+    photo: '/img/campus-puerta.jpg', keywords: ['puerta', 'porteria', 'portería', 'alfonso ugarte'],
+    actions: [{ label: 'Ver el mapa de la red', to: '/mapa' }] },
   { id: 'pabellon', name: 'Pabellón de aulas', icon: GraduationCap, pos: [-6, 15, -14], cam: [-6, 24, 34],
     text: 'Aulas y laboratorios en varios pisos, con pasillos abiertos y vista al jardín. Si te trabas en un curso, pide ayuda y le llega a quien domina el tema.',
     photo: '/img/campus-pabellon.jpg', keywords: ['aula', 'pabellon', 'laboratorio', 'lab'],
@@ -23,8 +31,8 @@ const PLACES: Place[] = [
     photo: '/img/campus-pasillo.jpg', keywords: ['pasillo', 'corredor'],
     actions: [{ label: 'Buscar un grupo de estudio', to: '/comunidades' }] },
   { id: 'jardin', name: 'Jardín central', icon: TreePine, pos: [-4, 1.5, 12], cam: [-26, 20, 42],
-    text: 'La gran área verde del campus. Aquí se arman tertulias, picnics de bienvenida y actividades de comunidades.',
-    keywords: ['jardin', 'jardín', 'area verde', 'patio'],
+    text: 'La gran área verde del campus, con las letras gigantes de La Salle. Aquí se arman tertulias, picnics de bienvenida y actividades de comunidades.',
+    photo: '/img/campus-letras.jpg', keywords: ['jardin', 'jardín', 'area verde', 'patio'],
     actions: [{ label: 'Ver comunidades', to: '/comunidades' }, { label: 'Crear una comunidad', to: '/comunidades/nueva' }] },
   { id: 'glorieta', name: 'Glorieta', icon: BookOpen, pos: [10, 6, 14], cam: [26, 12, 34],
     text: 'La glorieta de madera en medio del jardín: sombra, mesas y aire libre para estudiar en grupo o repasar antes de un examen.',
@@ -52,6 +60,32 @@ function cssColor(name: string) {
   return new THREE.Color(v || 'white');
 }
 
+function cssVar(name: string) {
+  return getComputedStyle(document.documentElement).getPropertyValue(name).trim() || 'white';
+}
+
+function star(ctx: CanvasRenderingContext2D, cx: number, cy: number, r: number) {
+  ctx.beginPath();
+  for (let i = 0; i < 10; i++) {
+    const a = -Math.PI / 2 + (i * Math.PI) / 5;
+    const rr = i % 2 ? r * 0.45 : r;
+    ctx.lineTo(cx + Math.cos(a) * rr, cy + Math.sin(a) * rr);
+  }
+  ctx.closePath();
+  ctx.fill();
+}
+
+function canvasTex(w: number, h: number, draw: (ctx: CanvasRenderingContext2D) => void) {
+  const c = document.createElement('canvas');
+  c.width = w; c.height = h;
+  const ctx = c.getContext('2d')!;
+  draw(ctx);
+  const t = new THREE.CanvasTexture(c);
+  t.colorSpace = THREE.SRGBColorSpace;
+  t.anisotropy = 4;
+  return t;
+}
+
 function hasWebGL() {
   try {
     const c = document.createElement('canvas');
@@ -63,7 +97,7 @@ function buildCampus(scene: THREE.Scene) {
   const C = {
     sky: cssColor('--campus-sky'), grass: cssColor('--campus-grass'), tree: cssColor('--campus-tree'), wall: cssColor('--campus-wall'),
     paving: cssColor('--campus-paving'), wood: cssColor('--campus-wood'), glass: cssColor('--campus-glass'), mountain: cssColor('--campus-mountain'),
-    snow: cssColor('--campus-snow'), navy: cssColor('--navy'), navy2: cssColor('--navy2'), gold: cssColor('--gold'), night: cssColor('--night'),
+    snow: cssColor('--campus-snow'), red: cssColor('--campus-red'), orange: cssColor('--campus-orange'), stone: cssColor('--campus-stone'), asphalt: cssColor('--campus-asphalt'), navy: cssColor('--navy'), navy2: cssColor('--navy2'), gold: cssColor('--gold'), sun: cssColor('--sun'), night: cssColor('--night'),
   };
   scene.background = C.sky;
   scene.fog = new THREE.Fog(C.sky, 180, 520);
@@ -151,6 +185,68 @@ function buildCampus(scene: THREE.Scene) {
     const roof = add(new THREE.BoxGeometry(w + 1, 0.5, d + 1), navy2, bx, 4.3, bz);
     roof.rotation.z = 0.04;
   }
+
+  // Calle y frontis de ULASALLE (Av. Alfonso Ugarte), según fotos del ingreso
+  add(new THREE.BoxGeometry(260, 0.2, 12), mat(C.asphalt), 0, -0.05, 70, false);
+  add(new THREE.BoxGeometry(170, 0.5, 4), paving, 0, 0.1, 62, false);
+  const white = cssVar('--white'), font = (px: number, w = 800) => `${w} ${px}px Nunito, system-ui, sans-serif`;
+  // Muro rojo con el logo de La Salle Universidad
+  const fx = -42, fz = 50;
+  add(new THREE.BoxGeometry(12, 14, 8), mat(C.red), fx, 7, fz);
+  const logo = canvasTex(512, 512, (ctx) => {
+    ctx.fillStyle = white; ctx.textBaseline = 'alphabetic';
+    ctx.font = font(150); ctx.fillText('La', 40, 190); star(ctx, 330, 135, 72);
+    ctx.fillText('Salle', 40, 340);
+    ctx.font = font(64, 700); ctx.fillText('Universidad', 44, 430);
+  });
+  const sign = add(new THREE.PlaneGeometry(9, 9), new THREE.MeshStandardMaterial({ map: logo, transparent: true, roughness: 0.6 }), fx, 8.5, fz + 4.02, false);
+  sign.receiveShadow = false;
+  // Cuerpo vidriado con columnas azules y el letrero de bienvenida
+  add(new THREE.BoxGeometry(24, 12, 7), mat(C.wall), fx + 18, 6, fz - 0.5);
+  add(new THREE.BoxGeometry(22, 10, 0.3), glass, fx + 18, 5.5, fz + 3.1, false);
+  for (let i = 0; i < 5; i++) add(new THREE.BoxGeometry(1.4, 13, 1.4), mat(C.navy2), fx + 8 + i * 5, 6.5, fz + 3.8);
+  add(new THREE.BoxGeometry(12, 0.8, 4), mat(C.wall), fx + 14, 8.4, fz + 5.5);
+  const hello = canvasTex(512, 96, (ctx) => {
+    ctx.fillStyle = cssVar('--navy2'); ctx.fillRect(0, 0, 512, 96);
+    ctx.fillStyle = white; ctx.font = font(58); ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.fillText('¡Bienvenidos!', 256, 52);
+  });
+  const banner = add(new THREE.PlaneGeometry(10, 1.9), new THREE.MeshStandardMaterial({ map: hello, roughness: 0.6 }), fx + 14, 9.4, fz + 7.52, false);
+  banner.rotation.x = -0.25;
+  for (let i = 0; i < 3; i++) {
+    add(new THREE.BoxGeometry(16, 0.35, 1.4), mat(C.paving), fx + 14, 0.18 + i * 0.35, fz + 9.2 - i * 1.3);
+    add(new THREE.BoxGeometry(16, 0.08, 0.25), mat(C.sun), fx + 14, 0.37 + i * 0.35, fz + 9.85 - i * 1.3, false);
+  }
+  // Puerta 517 con el mural de volcanes en piedra
+  const gx2 = 40, gz2 = 57;
+  add(new THREE.BoxGeometry(14, 8, 1.4), mat(C.wall), gx2, 4, gz2);
+  const mural = canvasTex(512, 300, (ctx) => {
+    ctx.fillStyle = cssVar('--campus-stone');
+    const tri = (x: number, y: number, w: number, h: number) => { ctx.beginPath(); ctx.moveTo(x, y + h); ctx.lineTo(x + w / 2, y); ctx.lineTo(x + w, y + h); ctx.closePath(); ctx.fill(); };
+    tri(20, 120, 200, 180); tri(150, 40, 230, 260); tri(310, 110, 190, 190);
+  });
+  add(new THREE.PlaneGeometry(13, 6), new THREE.MeshStandardMaterial({ map: mural, transparent: true, roughness: 0.9 }), gx2, 3.2, gz2 + 0.72, false);
+  const plate = canvasTex(512, 160, (ctx) => {
+    ctx.fillStyle = cssVar('--campus-stone'); ctx.fillRect(0, 0, 512, 160);
+    ctx.fillStyle = white; ctx.font = font(84); ctx.textBaseline = 'alphabetic';
+    ctx.fillText('La', 40, 100); star(ctx, 190, 72, 34); ctx.fillText('Salle', 236, 100);
+    ctx.font = font(38, 700); ctx.fillText('Universidad', 236, 145);
+  });
+  add(new THREE.BoxGeometry(9, 2.8, 0.6), mat(C.stone), gx2 - 1, 9.2, gz2);
+  add(new THREE.PlaneGeometry(8.6, 2.6), new THREE.MeshStandardMaterial({ map: plate, roughness: 0.6 }), gx2 - 1, 9.2, gz2 + 0.32, false);
+  add(new THREE.BoxGeometry(1.6, 10, 1.6), mat(C.orange), gx2 - 8, 5, gz2);
+  add(new THREE.BoxGeometry(1.4, 7, 1.4), mat(C.orange), gx2 + 8, 3.5, gz2);
+  add(new THREE.BoxGeometry(1.4, 7, 1.4), mat(C.orange), gx2 + 20, 3.5, gz2);
+  add(new THREE.BoxGeometry(14, 1.4, 3), mat(C.orange), gx2 + 14, 7.5, gz2);
+  const num = canvasTex(256, 96, (ctx) => { ctx.fillStyle = white; ctx.font = font(72); ctx.textBaseline = 'middle'; ctx.fillText('517', 70, 52); });
+  add(new THREE.PlaneGeometry(3.2, 1.2), new THREE.MeshStandardMaterial({ map: num, transparent: true }), gx2 + 18, 7.5, gz2 + 1.52, false);
+  for (let i = 0; i < 9; i++) add(new THREE.BoxGeometry(0.25, 5.5, 0.25), mat(C.night), gx2 + 9 + i * 1.3, 2.75, gz2);
+
+  // Letras gigantes de La Salle en el jardín
+  const letters = canvasTex(1024, 256, (ctx) => {
+    ctx.fillStyle = white; ctx.font = font(220); ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.fillText('La Salle', 512, 140);
+  });
+  const lm = new THREE.MeshStandardMaterial({ map: letters, transparent: true, alphaTest: 0.5, side: THREE.DoubleSide, roughness: 0.5 });
+  for (let k = 0; k < 4; k++) add(new THREE.PlaneGeometry(22, 5.5), lm, -14, 2.9, 25 - k * 0.12, false).castShadow = true;
 
   // Árboles: copas redondas y cipreses
   const leaf = mat(C.tree), trunk = wood;

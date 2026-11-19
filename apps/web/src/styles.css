@@ -36,6 +36,10 @@
   --campus-glass: #BFE0F2;
   --campus-mountain: #8C7B6B;
   --campus-snow: #F7F7F7;
+  --campus-red: #B83A2E;
+  --campus-orange: #C65A34;
+  --campus-stone: #3B3836;
+  --campus-asphalt: #8A8D92;
 
   /* Derivados: mezclas de la paleta, no colores nuevos */
   --card: var(--white);
