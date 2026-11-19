@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { NavLink, Link, Outlet, useLocation } from 'react-router-dom';
-import { Home, Map, Users, HandHelping, Mountain, Plus, Sparkles, Share2, LifeBuoy, Rocket, Mountain as MountainIcon, Sparkle } from 'lucide-react';
+import { Home, Map, Users, HandHelping, Mountain, Plus, Sparkles, Share2, LifeBuoy, Rocket, Sparkle, ChevronRight, X, ArrowRight } from 'lucide-react';
 import { useAuth } from '../lib/auth';
 import { shareLink } from '../lib/fx';
 import { Avatar } from './ui';
@@ -18,6 +18,13 @@ export default function Layout() {
   const [open, setOpen] = useState(false);
   const loc = useLocation();
   useEffect(() => { setOpen(false); window.scrollTo(0, 0); }, [loc.pathname]);
+  useEffect(() => {
+    if (!open) return;
+    const onKey = (e: KeyboardEvent) => { if (e.key === 'Escape') setOpen(false); };
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, [open]);
+  const first = me?.name?.split(' ')[0] ?? '';
 
   return (
     <div className="shell">
@@ -43,11 +50,44 @@ export default function Layout() {
       </main>
 
       {open && <button className="sheet-backdrop" aria-label="Cerrar" onClick={() => setOpen(false)} />}
-      <div className={`sheet ${open ? 'open' : ''}`} role="dialog" aria-label="Crear" aria-hidden={!open}>
-        <Link to="/mentoria/nueva" className="sheet-item s1"><span><LifeBuoy size={24} /></span><div><strong>Pedir ayuda</strong><small>Le llega a quien sabe del tema</small></div></Link>
-        <Link to="/comunidades/nueva" className="sheet-item s2"><span><Rocket size={24} /></span><div><strong>Crear comunidad</strong><small>Club, semillero o grupo de estudio</small></div></Link>
-        <Link to="/retos" className="sheet-item s3"><span><MountainIcon size={24} /></span><div><strong>Unirme a un reto</strong><small>Problemas reales del territorio</small></div></Link>
-        <button className="sheet-item s4" onClick={() => shareLink('Únete a mi parche')}><span><Share2 size={22} /></span><div><strong>Invitar compañeros</strong><small>Comparte el enlace por WhatsApp</small></div></button>
+      <div className={`sheet ${open ? 'open' : ''}`} role="dialog" aria-modal="true" aria-labelledby="sheet-title" aria-hidden={!open}>
+        <span className="sheet-handle" aria-hidden />
+        <div className="sheet-head">
+          <span className="sheet-mascot" aria-hidden><img src="/img/mascota-juanita.webp" alt="" /></span>
+          <div>
+            <h2 id="sheet-title">¿Qué hacemos hoy{first ? `, ${first}` : ''}?</h2>
+            <p>Juanita te acompaña. Elige por dónde empezar.</p>
+          </div>
+          <button className="sheet-close" onClick={() => setOpen(false)} aria-label="Cerrar menú"><X size={20} /></button>
+        </div>
+
+        <Link to="/mentoria/nueva" className="sheet-hero">
+          <span className="sheet-ico hero"><LifeBuoy size={26} /></span>
+          <span className="sheet-text">
+            <span className="sheet-kicker">Lo más rápido</span>
+            <strong>Pedir ayuda</strong>
+            <small>Le llega a quien sabe del tema, en tu sede o en Colombia</small>
+          </span>
+          <span className="sheet-go" aria-hidden><ArrowRight size={20} /></span>
+        </Link>
+
+        <div className="sheet-list">
+          <Link to="/comunidades/nueva" className="sheet-row">
+            <span className="sheet-ico gold"><Rocket size={22} /></span>
+            <span className="sheet-text"><strong>Crear comunidad</strong><small>Club, semillero o grupo de estudio</small></span>
+            <ChevronRight size={20} className="sheet-chev" aria-hidden />
+          </Link>
+          <Link to="/retos" className="sheet-row">
+            <span className="sheet-ico navy"><Mountain size={22} /></span>
+            <span className="sheet-text"><strong>Unirme a un reto</strong><small>Problemas reales del territorio</small></span>
+            <ChevronRight size={20} className="sheet-chev" aria-hidden />
+          </Link>
+          <button className="sheet-row" onClick={() => shareLink('Únete a mi parche')}>
+            <span className="sheet-ico soft"><Share2 size={22} /></span>
+            <span className="sheet-text"><strong>Invitar compañeros</strong><small>Comparte el enlace por WhatsApp</small></span>
+            <ChevronRight size={20} className="sheet-chev" aria-hidden />
+          </button>
+        </div>
       </div>
 
       <nav className="tabbar" aria-label="Navegación principal">
