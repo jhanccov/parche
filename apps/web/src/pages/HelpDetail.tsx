@@ -57,7 +57,7 @@ export default function HelpDetail() {
           <span className="muted">{ago(h.created_at)}</span>
         </div>
         {h.mentor && <p className="small">Mentor: <strong>{h.mentor}</strong> ({h.mentor_university})</p>}
-        {h.status === 'resuelta' && <p className="small">Resuelta en {Number(h.hours)} h · {'★'.repeat(h.rating ?? 0)}</p>}
+        {h.status === 'resuelta' && <p className="small rating-line">Resuelta en {Number(h.hours)} h · <span className="rating" aria-label={`${h.rating ?? 0} de 5`}>{Array.from({ length: h.rating ?? 0 }, (_, i) => <Star key={i} size={14} fill="currentColor" />)}</span></p>}
         <ErrorMsg msg={err} />
         <div className="row gap">
           {h.status === 'abierta' && !mine && <button className="btn gold" onClick={() => act(`/help/${id}/offer`)}>Ofrezco ayuda</button>}

@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { NavLink, Link, Outlet, useLocation } from 'react-router-dom';
-import { Home, Map, Users, HandHelping, Mountain, Plus, Sparkles, Share2 } from 'lucide-react';
+import { Home, Map, Users, HandHelping, Mountain, Plus, Sparkles, Share2, LifeBuoy, Rocket, Mountain as MountainIcon, Sparkle } from 'lucide-react';
 import { useAuth } from '../lib/auth';
 import { shareLink } from '../lib/fx';
 import { Avatar } from './ui';
@@ -23,7 +23,7 @@ export default function Layout() {
     <div className="shell">
       <header className="topbar">
         <Link to="/" className="brand" aria-label="Parche, inicio">
-          <span className="wordmark">parche<i aria-hidden>✦</i></span>
+          <span className="wordmark">parche<i aria-hidden><Sparkle size={16} fill="currentColor" strokeWidth={0} /></i></span>
         </Link>
         <div className="topbar-right">
           <Link to="/impacto" className="pill gold topbar-impact" aria-label="Impacto de la red">
@@ -32,7 +32,7 @@ export default function Layout() {
           <button className="icon-btn gold" onClick={() => setOpen(true)} aria-label="Crear" aria-expanded={open}>
             <Plus size={20} />
           </button>
-          <Link to="/perfil" className="pts" title="Tus puntos">✦ {me?.points ?? 0}</Link>
+          <Link to="/perfil" className="pts" title="Tus puntos"><Sparkle size={13} fill="currentColor" strokeWidth={0} aria-hidden /> {me?.points ?? 0}</Link>
           <Link to="/perfil" aria-label="Tu perfil">
             <Avatar name={me?.name} size={36} />
           </Link>
@@ -44,9 +44,9 @@ export default function Layout() {
 
       {open && <button className="sheet-backdrop" aria-label="Cerrar" onClick={() => setOpen(false)} />}
       <div className={`sheet ${open ? 'open' : ''}`} role="dialog" aria-label="Crear" aria-hidden={!open}>
-        <Link to="/mentoria/nueva" className="sheet-item s1"><span>🆘</span><div><strong>Pedir ayuda</strong><small>Le llega a quien sabe del tema</small></div></Link>
-        <Link to="/comunidades/nueva" className="sheet-item s2"><span>🚀</span><div><strong>Crear comunidad</strong><small>Club, semillero o grupo de estudio</small></div></Link>
-        <Link to="/retos" className="sheet-item s3"><span>🏔️</span><div><strong>Unirme a un reto</strong><small>Problemas reales del territorio</small></div></Link>
+        <Link to="/mentoria/nueva" className="sheet-item s1"><span><LifeBuoy size={24} /></span><div><strong>Pedir ayuda</strong><small>Le llega a quien sabe del tema</small></div></Link>
+        <Link to="/comunidades/nueva" className="sheet-item s2"><span><Rocket size={24} /></span><div><strong>Crear comunidad</strong><small>Club, semillero o grupo de estudio</small></div></Link>
+        <Link to="/retos" className="sheet-item s3"><span><MountainIcon size={24} /></span><div><strong>Unirme a un reto</strong><small>Problemas reales del territorio</small></div></Link>
         <button className="sheet-item s4" onClick={() => shareLink('Únete a mi parche')}><span><Share2 size={22} /></span><div><strong>Invitar compañeros</strong><small>Comparte el enlace por WhatsApp</small></div></button>
       </div>
 

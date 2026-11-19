@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Award, FileText, LogOut, Pencil, Trash2 } from 'lucide-react';
+import { Award, FileText, LogOut, Pencil, Trash2, BadgeCheck } from 'lucide-react';
 import { api } from '../lib/api';
 import { useAuth } from '../lib/auth';
 import { Avatar, Chip, Section, Stat } from '../components/ui';
@@ -21,7 +21,7 @@ export default function Profile() {
       <div className="profile-head card">
         <Avatar name={me.name} size={72} />
         <div>
-          <Chip tone="gold">✦ Estudiante verificado · {me.university}</Chip>
+          <Chip tone="gold"><BadgeCheck size={13} /> Estudiante verificado · {me.university}</Chip>
           <h1 className="h2">{me.name}</h1>
           <p className="muted">{me.career} · semestre {me.semester} · {me.campus}</p>
           {me.bio && <p>{me.bio}</p>}

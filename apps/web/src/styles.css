@@ -393,3 +393,17 @@ a.fbtn { text-decoration: none; display: grid; place-items: center; }
 .mascot-hello { margin: 0 0 14px; border-radius: 20px; overflow: hidden; position: relative; background: var(--navy); }
 .mascot-hello img { display: block; width: 100%; aspect-ratio: 720 / 380; object-fit: cover; }
 .mascot-hello figcaption { position: absolute; left: 0; right: 0; bottom: 0; padding: 22px 14px 10px; color: var(--white); font-weight: 800; font-size: 14px; background: linear-gradient(180deg, color-mix(in srgb, var(--night) 0%, transparent), color-mix(in srgb, var(--night) 85%, transparent)); }
+
+/* Íconos Lucide en lugar de emojis */
+.wordmark i { display: inline-flex; }
+.pts { display: inline-flex; align-items: center; gap: 4px; }
+.chip svg, .login-tags svg, .btn svg { flex: 0 0 auto; }
+.chip { display: inline-flex; align-items: center; gap: 4px; }
+.login-tags span { display: inline-flex; align-items: center; gap: 6px; }
+.sheet-item > span { color: var(--white); }
+.s2 > span { color: var(--night); }
+.wave { color: var(--sun); vertical-align: -3px; }
+.bubbles span { color: var(--white); }
+.mk span { display: grid; place-items: center; line-height: 0; }
+.mk svg { display: block; }
+.rating { display: inline-flex; gap: 2px; color: var(--gold); vertical-align: -2px; }

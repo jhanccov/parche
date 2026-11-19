@@ -1,13 +1,13 @@
 import { FormEvent, useEffect, useState } from 'react';
 import { Link, Navigate, useNavigate } from 'react-router-dom';
-import { ShieldCheck } from 'lucide-react';
+import { Cloud, Drama, Handshake, Laptop, Microscope, Mountain, PencilRuler, Rocket, ShieldCheck, Sparkle, Sprout, Users, Volleyball } from 'lucide-react';
 import { api } from '../lib/api';
 import { setThemeColor } from '../lib/fx';
 import { useAuth } from '../lib/auth';
 import { Avatar, ErrorMsg, Flag } from '../components/ui';
 
 const VERBS = ['Aprende', 'Crea', 'Conecta', 'Transforma'];
-const BUBBLES = ['💻', '📐', '🤝', '🏔️', '🚀', '🎭', '⚽', '🔬', '🌱', '☁️'];
+const BUBBLES = [Laptop, PencilRuler, Handshake, Mountain, Rocket, Drama, Volleyball, Microscope, Sprout, Cloud];
 
 type Demo = { id: string; name: string; career: string; university: string; campus: string };
 
@@ -80,17 +80,17 @@ export default function Login() {
   return (
     <div className="login">
       <div className="bubbles" aria-hidden>
-        {BUBBLES.map((b, i) => <span key={i} style={{ left: `${(i * 37) % 92}%`, animationDelay: `${-i * 1.7}s`, animationDuration: `${13 + (i % 4) * 3}s` }}>{b}</span>)}
+        {BUBBLES.map((B, i) => <span key={i} style={{ left: `${(i * 37) % 92}%`, animationDelay: `${-i * 1.7}s`, animationDuration: `${13 + (i % 4) * 3}s` }}><B size={28} /></span>)}
       </div>
       <figure className="login-cover">
         <img src="/img/portada-colombia.jpg" alt="Delegación de ULASALLE Arequipa en la Universidad de La Salle, Bogotá, con las banderas del Perú, La Salle Internacional y Arequipa" />
         <figcaption><Flag country="Perú" /> <Flag country="Colombia" /> Estudiantes de ULASALLE Arequipa en La Salle Bogotá, octubre de 2026</figcaption>
       </figure>
       <div className="login-hero">
-        <span className="wordmark big">parche<i aria-hidden>✦</i></span>
+        <span className="wordmark big">parche<i aria-hidden><Sparkle size={22} fill="currentColor" strokeWidth={0} /></i></span>
         <h1><span className="verb" key={verb}>{VERBS[verb]}</span><br />con tu parche La Salle</h1>
         <p>Comunidades, mentoría entre pares y retos reales con estudiantes de Perú y Colombia.</p>
-        <div className="login-tags"><span>👥 Comunidades</span><span>🤝 Mentoría</span><span>🏔️ Retos</span></div>
+        <div className="login-tags"><span><Users size={16} /> Comunidades</span><span><Handshake size={16} /> Mentoría</span><span><Mountain size={16} /> Retos</span></div>
         <p className="login-countries"><Flag country="Perú" size={22} /> Perú <Flag country="Colombia" size={22} /> Colombia</p>
       </div>
 

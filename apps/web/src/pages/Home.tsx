@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState, MouseEvent } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { CalendarDays, HandHelping, Heart, MapPin, Mountain, Plus, Share2, Users, UserPlus, Check } from 'lucide-react';
+import { CalendarDays, HandHelping, Heart, MapPin, Mountain, Plus, Share2, Users, UserPlus, Check, Hand } from 'lucide-react';
 import { useAuth } from '../lib/auth';
 import { useApi } from '../lib/useApi';
 import { api } from '../lib/api';
@@ -133,7 +133,7 @@ export default function Home() {
         aria-label="Delegación de ULASALLE Arequipa en la Universidad de La Salle, Bogotá, con las banderas del Perú, La Salle Internacional y Arequipa"
       >
         <span className="cover-tag"><Flag country="Perú" /> Perú y <Flag country="Colombia" /> Colombia, una sola red La Salle</span>
-        <h1>Hola, {first} <span className="wave" aria-hidden>👋</span></h1>
+        <h1>Hola, {first} <span className="wave" aria-hidden><Hand size={30} /></span></h1>
         <p className="prompt" key={prompt} aria-live="polite">{PROMPTS[prompt]}</p>
       </section>
 

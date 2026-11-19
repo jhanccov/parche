@@ -2,13 +2,13 @@
 const BLUE = 'linear-gradient(155deg, var(--navy2) 0%, var(--navy) 55%, var(--night) 100%)';
 const GOLD = 'linear-gradient(155deg, var(--sun) 0%, var(--gold) 45%, var(--night) 100%)';
 
-export const CATEGORIES: Record<string, { label: string; color: string; emoji: string; grad: string; img: string }> = {
-  tecnologia: { label: 'Tecnología', color: 'var(--navy)', emoji: '💻', grad: BLUE, img: '/img/cat-tecnologia.jpg' },
-  investigacion: { label: 'Investigación', color: 'var(--navy2)', emoji: '🔬', grad: BLUE, img: '/img/cat-investigacion.jpg' },
-  territorio: { label: 'Territorio', color: 'var(--night)', emoji: '🌄', grad: BLUE, img: '/img/cat-territorio.jpg' },
-  cultura: { label: 'Cultura', color: 'var(--gold-ink)', emoji: '🎭', grad: GOLD, img: '/img/cat-cultura.jpg' },
-  deporte: { label: 'Deporte', color: 'var(--gold-ink)', emoji: '⚽', grad: GOLD, img: '/img/cat-deporte.jpg' },
-  bienestar: { label: 'Bienestar', color: 'var(--navy2)', emoji: '🌱', grad: BLUE, img: '/img/cat-bienestar.jpg' },
+export const CATEGORIES: Record<string, { label: string; color: string; grad: string; img: string }> = {
+  tecnologia: { label: 'Tecnología', color: 'var(--navy)', grad: BLUE, img: '/img/cat-tecnologia.jpg' },
+  investigacion: { label: 'Investigación', color: 'var(--navy2)', grad: BLUE, img: '/img/cat-investigacion.jpg' },
+  territorio: { label: 'Territorio', color: 'var(--night)', grad: BLUE, img: '/img/cat-territorio.jpg' },
+  cultura: { label: 'Cultura', color: 'var(--gold-ink)', grad: GOLD, img: '/img/cat-cultura.jpg' },
+  deporte: { label: 'Deporte', color: 'var(--gold-ink)', grad: GOLD, img: '/img/cat-deporte.jpg' },
+  bienestar: { label: 'Bienestar', color: 'var(--navy2)', grad: BLUE, img: '/img/cat-bienestar.jpg' },
 };
 
 export const ODS: Record<number, string> = {
@@ -44,4 +44,3 @@ export function colorFor(s?: string | null) {
   return PALETTE[h % PALETTE.length];
 }
 
-export const flag = (country?: string | null) => (country === 'Perú' ? '🇵🇪' : country === 'Colombia' ? '🇨🇴' : '');

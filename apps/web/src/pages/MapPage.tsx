@@ -2,23 +2,26 @@ import { useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { AttributionControl, MapContainer, Marker, Popup, TileLayer, ZoomControl } from 'react-leaflet';
 import L, { LatLngBoundsExpression } from 'leaflet';
+import { renderToStaticMarkup } from 'react-dom/server';
+import { CircleHelp, GraduationCap, Mountain, Star, Users, Wheat, LucideIcon } from 'lucide-react';
 import { useApi } from '../lib/useApi';
 import { useAuth } from '../lib/auth';
 import { CATEGORIES, when } from '../lib/format';
 import { Empty, ErrorMsg, Loading } from '../components/ui';
 
-const icon = (cls: string, label: string) =>
-  L.divIcon({ className: '', html: `<div class="mk ${cls}"><span>${label}</span></div>`, iconSize: [34, 34], iconAnchor: [17, 34], popupAnchor: [0, -30] });
+const svg = (I: LucideIcon) => renderToStaticMarkup(<I size={16} strokeWidth={2.4} />);
+const icon = (cls: string, I: LucideIcon) =>
+  L.divIcon({ className: '', html: `<div class="mk ${cls}"><span>${svg(I)}</span></div>`, iconSize: [34, 34], iconAnchor: [17, 34], popupAnchor: [0, -30] });
 
 const ICONS = {
-  campus: icon('mk-campus', '🎓'),
-  rural: icon('mk-rural', '🌾'),
-  event: icon('mk-event', '★'),
-  challenge: icon('mk-challenge', '⛰'),
-  help: icon('mk-help', '?'),
+  campus: icon('mk-campus', GraduationCap),
+  rural: icon('mk-rural', Wheat),
+  event: icon('mk-event', Star),
+  challenge: icon('mk-challenge', Mountain),
+  help: icon('mk-help', CircleHelp),
 };
 const communityIcon = (cat: string) =>
-  L.divIcon({ className: '', html: `<div class="mk mk-community" style="background:${CATEGORIES[cat]?.color ?? 'var(--navy)'}"><span>👥</span></div>`, iconSize: [34, 34], iconAnchor: [17, 34], popupAnchor: [0, -30] });
+  L.divIcon({ className: '', html: `<div class="mk mk-community" style="background:${CATEGORIES[cat]?.color ?? 'var(--navy)'}"><span>${svg(Users)}</span></div>`, iconSize: [34, 34], iconAnchor: [17, 34], popupAnchor: [0, -30] });
 
 // Sin API key: OpenStreetMap estándar no requiere clave ni cuenta.
 // Se evita CARTO/Google/Mapbox para que el mapa funcione en local, Docker y Render sin configurar nada.

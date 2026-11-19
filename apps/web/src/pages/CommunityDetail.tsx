@@ -98,7 +98,7 @@ export default function CommunityDetail() {
                   <span className="muted small">{e.virtual_url ? <Video size={12} /> : <MapPin size={12} />} {e.place}</span>
                 </div>
                 <button className={`btn small ${e.rsvp ? 'navy' : 'ghost'}`} onClick={() => act(`/events/${e.id}/rsvp`)}>
-                  {e.rsvp ? 'Voy ✓' : 'Asistiré'} · {e.going}
+                  {e.rsvp ? <><Check size={14} /> Voy</> : 'Asistiré'} · {e.going}
                 </button>
               </div>
             ))}
