@@ -132,7 +132,7 @@ legend small { color: var(--muted); font-weight: 400; }
 .chip-navy { background: var(--navy); color: var(--white); }
 .chip-soft { background: var(--navy-soft); color: var(--navy2); }
 
-.avatar { display: inline-grid; place-items: center; border-radius: 30%; color: var(--white); font-weight: 800; flex: none; font-family: 'Nunito', sans-serif; }
+.avatar { display: inline-flex; flex-direction: row; align-items: center; justify-content: center; line-height: 1; letter-spacing: 0; text-align: center; border-radius: 30%; color: var(--white); font-weight: 800; flex: none; font-family: 'Nunito', sans-serif; }
 
 .hello h1 { font-size: 28px; }
 .quick { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
@@ -146,7 +146,7 @@ legend small { color: var(--muted); font-weight: 400; }
 .event-date { display: inline-flex; align-items: center; gap: 4px; color: var(--gold-ink); font-weight: 700; font-size: 13px; }
 
 .meta { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 12px; font-size: 13px; color: var(--muted); }
-.meta span { display: inline-flex; align-items: center; gap: 4px; }
+.meta > span:not(.avatar) { display: inline-flex; align-items: center; gap: 4px; }
 .meta.light { color: color-mix(in srgb, var(--white) 85%, transparent); }
 
 .progress { height: 8px; background: var(--line); border-radius: 99px; overflow: hidden; }
@@ -243,7 +243,7 @@ legend small { color: var(--muted); font-weight: 400; }
 .login-card form { display: flex; flex-direction: column; gap: 8px; }
 .demo-list { display: grid; gap: 8px; }
 .demo-user { display: flex; align-items: center; gap: 10px; background: var(--surface); border: 1.5px solid var(--line); border-radius: 14px; padding: 10px; text-align: left; }
-.demo-user span { display: flex; flex-direction: column; }
+.demo-user > span:not(.avatar) { display: flex; flex-direction: column; }
 .demo-user small { color: var(--muted); }
 
 .map-page { position: relative; margin: -16px; }
@@ -457,3 +457,6 @@ a.fbtn { text-decoration: none; display: grid; place-items: center; }
   .sheet { transition: none; }
   .sheet.open .sheet-head, .sheet.open .sheet-hero, .sheet.open .sheet-row { animation: none; }
 }
+
+/* Tarjetas que combinan .card con listas: conservan el relleno de la tarjeta */
+.checklist.card { padding: 14px 16px; gap: 10px; }
