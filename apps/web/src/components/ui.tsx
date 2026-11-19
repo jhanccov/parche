@@ -89,3 +89,27 @@ export function SkillPicker({ options, value, onChange, max = 8 }: { options: st
     </div>
   );
 }
+
+// Banderas en SVG: los emojis de bandera no se ven en Windows (salen como letras "CO" y "PE").
+export function Flag({ country, size = 18 }: { country?: string | null; size?: number }) {
+  const h = Math.round((size * 2) / 3);
+  if (country === 'Colombia') {
+    return (
+      <svg className="flag" width={size} height={h} viewBox="0 0 3 2" role="img" aria-label="Bandera de Colombia">
+        <rect width="3" height="1" fill="#FCD116" />
+        <rect y="1" width="3" height="0.5" fill="#003893" />
+        <rect y="1.5" width="3" height="0.5" fill="#CE1126" />
+      </svg>
+    );
+  }
+  if (country === 'Perú') {
+    return (
+      <svg className="flag" width={size} height={h} viewBox="0 0 3 2" role="img" aria-label="Bandera del Perú">
+        <rect width="3" height="2" fill="#FFFFFF" />
+        <rect width="1" height="2" fill="#D91023" />
+        <rect x="2" width="1" height="2" fill="#D91023" />
+      </svg>
+    );
+  }
+  return null;
+}

@@ -1,6 +1,5 @@
 import { useApi } from '../lib/useApi';
-import { flag } from '../lib/format';
-import { Loading, Section, Stat } from '../components/ui';
+import { Flag, Loading, Section, Stat } from '../components/ui';
 
 export default function Impact() {
   const { data } = useApi<any>('/impact');
@@ -27,7 +26,7 @@ export default function Impact() {
         <div className="card bars">
           {data.byUniversity.map((u: any) => (
             <div key={u.university} className="bar-row">
-              <span className="bar-label">{flag(u.country)} {u.university}</span>
+              <span className="bar-label"><Flag country={u.country} /> {u.university}</span>
               <span className="bar"><span style={{ width: `${(u.students / maxStu) * 100}%` }} /></span>
               <span className="bar-val">{u.students}</span>
             </div>

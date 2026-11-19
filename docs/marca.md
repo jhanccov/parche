@@ -9,7 +9,7 @@
 
 ## Logo
 
-- Wordmark: Nunito ExtraBold, navy `#0A3556`, con spark ámbar montado sobre
+- Wordmark: Nunito ExtraBold, azul La Salle `#2B3682`, con spark ámbar montado sobre
   la "e". Fuente de verdad: `logo/render_logo.py` (`logo-parche*.png`).
 - Isotipo: spark ámbar sobre rounded-square navy, con aire para recorte
   maskable. Fuente de verdad: `render_icon()` en el mismo script.
@@ -20,14 +20,16 @@
 
 ## Colores
 
+Desde noviembre de 2026 la paleta toma la identidad de la Universidad de La Salle (Bogotá, Colombia): azul índigo `#2B3682`, azul noche `#1E2344` y dorado `#F49C18`, medidos sobre su pieza oficial con la mascota Juanita. Las banderas del Perú y de Colombia se dibujan en SVG con sus colores oficiales (Colombia: amarillo `#FCD116`, azul `#003893`, rojo `#CE1126`; Perú: rojo `#D91023` y blanco), porque los emojis de bandera no se ven en Windows.
+
 | Token | Valor | Uso |
 | --- | --- | --- |
-| `--navy` | `#033259` | Superficies principales, texto sobre claro |
-| `--navy2` | `#0B4A7E` | Variantes, iconos secundarios |
-| `--night` | `#06162B` | Fondo oscuro (home, topbar, tabbar) |
-| `--gold` / `--sun` | `#F7A800` / `#FFB800` | Solo sobre superficies oscuras |
+| `--navy` | `#2B3682` | Superficies principales, texto sobre claro |
+| `--navy2` | `#3D4BA8` | Variantes, iconos secundarios |
+| `--night` | `#1E2344` | Fondo oscuro (home, topbar, tabbar) |
+| `--gold` / `--sun` | `#F49C18` / `#FFB21E` | Solo sobre superficies oscuras |
 | `--gold-ink` | `#8A5F00` | Texto e iconos ámbar sobre fondos claros (AA) |
-| `--gold-soft` | `#FFF4D6` | Fondos de aviso |
+| `--gold-soft` | `#FDEFD6` | Fondos de aviso |
 | `--green` | `#2F7D5C` | Territorio, rural |
 | `--bg` / `--card` | `#FBF7EE` / `#FFFFFF` | Fondo claro / tarjetas |
 | `--danger` | `#B5482E` | Errores |

@@ -18,7 +18,7 @@ const ICONS = {
   help: icon('mk-help', '?'),
 };
 const communityIcon = (cat: string) =>
-  L.divIcon({ className: '', html: `<div class="mk mk-community" style="background:${CATEGORIES[cat]?.color ?? '#033259'}"><span>👥</span></div>`, iconSize: [34, 34], iconAnchor: [17, 34], popupAnchor: [0, -30] });
+  L.divIcon({ className: '', html: `<div class="mk mk-community" style="background:${CATEGORIES[cat]?.color ?? '#2B3682'}"><span>👥</span></div>`, iconSize: [34, 34], iconAnchor: [17, 34], popupAnchor: [0, -30] });
 
 // Sin API key: OpenStreetMap estándar no requiere clave ni cuenta.
 // Se evita CARTO/Google/Mapbox para que el mapa funcione en local, Docker y Render sin configurar nada.
@@ -118,9 +118,9 @@ export default function MapPage() {
       )}
       <p className="map-note">
         <span className="legend" aria-label="Leyenda">
-          <i className="dot" style={{ background: '#033259' }} /> Sede
+          <i className="dot" style={{ background: '#2B3682' }} /> Sede
           <i className="dot" style={{ background: '#2F7D5C' }} /> Rural
-          <i className="dot" style={{ background: '#F7A800' }} /> Evento
+          <i className="dot" style={{ background: '#F49C18' }} /> Evento
           <i className="dot" style={{ background: '#B07A00' }} /> Reto
           <i className="dot" style={{ background: '#6B4C9A' }} /> Ayuda
         </span>

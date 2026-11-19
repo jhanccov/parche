@@ -2,14 +2,14 @@ import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { MapPin, Users } from 'lucide-react';
 import { useApi } from '../lib/useApi';
-import { flag, ODS } from '../lib/format';
-import { Chip, Empty, Loading } from '../components/ui';
+import { ODS } from '../lib/format';
+import { Chip, Empty, Flag, Loading } from '../components/ui';
 
 export function ChallengeCard({ c }: { c: any }) {
   return (
     <Link to={`/retos/${c.id}`} className="card challenge-card">
       <div className="row-between">
-        <span className="territory"><MapPin size={14} /> {flag(c.country)} {c.territory}</span>
+        <span className="territory"><MapPin size={14} /> <Flag country={c.country} /> {c.territory}</span>
         <Chip tone={c.status === 'abierto' ? 'gold' : 'navy'}>{c.status === 'abierto' ? 'Busca equipo' : 'En progreso'}</Chip>
       </div>
       <h3>{c.title}</h3>
@@ -38,8 +38,8 @@ export default function Challenges() {
       <p className="muted">Problemas reales de comunidades rurales y territorios de Colombia y Perú. Arma un equipo con estudiantes de otras sedes y universidades y construye la solución.</p>
       <div className="filters">
         <button className={!country ? 'on' : ''} onClick={() => setCountry('')}>Todos</button>
-        <button className={country === 'Colombia' ? 'on' : ''} onClick={() => setCountry('Colombia')}>🇨🇴 Colombia</button>
-        <button className={country === 'Perú' ? 'on' : ''} onClick={() => setCountry('Perú')}>🇵🇪 Perú</button>
+        <button className={country === 'Colombia' ? 'on' : ''} onClick={() => setCountry('Colombia')}><Flag country="Colombia" /> Colombia</button>
+        <button className={country === 'Perú' ? 'on' : ''} onClick={() => setCountry('Perú')}><Flag country="Perú" /> Perú</button>
       </div>
       <div className="filters">
         <button className={!status ? 'on' : ''} onClick={() => setStatus('')}>Cualquier estado</button>

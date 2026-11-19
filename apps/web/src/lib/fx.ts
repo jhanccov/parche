@@ -1,9 +1,9 @@
-const COLORS = ['#FFB800', '#18C6B3', '#FF4D8D', '#FFFFFF', '#5AA9FF'];
+const COLORS = ['#F49C18', '#FCD116', '#CE1126', '#18C6B3', '#FF4D8D', '#FFFFFF', '#5AA9FF'];
 
 export const APP_URL = typeof window !== 'undefined' ? window.location.origin : '';
 
-const THEME_DEFAULT = '#033259';
-const THEME_DARK = '#06162B';
+const THEME_DEFAULT = '#2B3682';
+const THEME_DARK = '#1E2344';
 
 /** Mantiene el theme-color del navegador alineado con el fondo real
  *  (las páginas oscuras usan night, no navy) para evitar el flash. */

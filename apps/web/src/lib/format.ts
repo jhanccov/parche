@@ -33,7 +33,7 @@ export function initials(name?: string | null) {
   return ((p[0]?.[0] ?? '') + (p[1]?.[0] ?? '')).toUpperCase();
 }
 
-const PALETTE = ['#033259', '#0B4A7E', '#2F7D5C', '#6B4C9A', '#B5482E', '#1F7A8C', '#B07A00'];
+const PALETTE = ['#2B3682', '#3D4BA8', '#2F7D5C', '#6B4C9A', '#B5482E', '#1F7A8C', '#B07A00'];
 export function colorFor(s?: string | null) {
   let h = 0;
   for (const ch of s ?? '') h = (h * 31 + ch.charCodeAt(0)) >>> 0;

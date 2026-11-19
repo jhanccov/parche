@@ -4,8 +4,8 @@ import math, os
 
 OUT = os.path.dirname(os.path.abspath(__file__))
 FONT = os.path.join(OUT, "Nunito-ExtraBold.ttf")
-NAVY = (10, 53, 86, 255)
-AMBER = (245, 163, 0, 255)
+NAVY = (43, 54, 130, 255)  # azul La Salle Colombia #2B3682
+AMBER = (244, 156, 24, 255)  # dorado La Salle Colombia #F49C18
 
 def font_at(size):
     f = ImageFont.truetype(FONT, size)

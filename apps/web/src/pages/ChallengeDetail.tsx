@@ -4,8 +4,8 @@ import { Building2, Globe2, MapPin } from 'lucide-react';
 import { api } from '../lib/api';
 import { useAuth } from '../lib/auth';
 import { useApi } from '../lib/useApi';
-import { ago, flag, ODS } from '../lib/format';
-import { Avatar, Chip, ErrorMsg, Loading, Section } from '../components/ui';
+import { ago, ODS } from '../lib/format';
+import { Avatar, Chip, ErrorMsg, Flag, Loading, Section } from '../components/ui';
 import Chat from '../components/Chat';
 
 export default function ChallengeDetail() {
@@ -44,7 +44,7 @@ export default function ChallengeDetail() {
   return (
     <div className="page">
       <div className="hero-card green">
-        <span className="territory light"><MapPin size={14} /> {flag(c.country)} {c.territory}, {c.country}</span>
+        <span className="territory light"><MapPin size={14} /> <Flag country={c.country} /> {c.territory}, {c.country}</span>
         <h1>{c.title}</h1>
         <p>{c.summary}</p>
         <div className="meta light"><Building2 size={14} /> {c.organization}</div>
