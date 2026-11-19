@@ -9,6 +9,8 @@ const { buildApp } = await import('../src/app.js');
 const { migrate } = await import('../src/migrate.js');
 const { resetAndSeed } = await import('../src/seed.js');
 const { pool } = await import('../src/db.js');
+const { parseActions } = await import('../src/routes/assistant.js');
+const { config } = await import('../src/config.js');
 
 let app: Awaited<ReturnType<typeof buildApp>>;
 
@@ -169,5 +171,47 @@ describe('Parche API', () => {
     assert.equal(r.statusCode, 204);
     const row = await pool.query('select 1 from users where email = $1', ['borrar.cuenta@unisalle.edu.co']);
     assert.equal(row.rowCount, 0);
+  });
+
+  test('el asistente Juanita responde en modo guía y lleva a la pantalla correcta', async () => {
+    const { token } = await login('asistente.prueba@ulasalle.edu.pe');
+    const sin = await app.inject({ method: 'POST', url: '/api/assistant', payload: { messages: [{ role: 'user', content: 'hola' }] } });
+    assert.equal(sin.statusCode, 401);
+    const r = await call(token, 'POST', '/api/assistant', { messages: [{ role: 'user', content: '¿Cómo pido ayuda en Cálculo?' }], page: '/' });
+    assert.equal(r.statusCode, 200, r.body);
+    const j = r.json();
+    assert.equal(j.mode, 'guia');
+    assert.ok(j.actions.some((a: any) => a.to === '/mentoria/nueva'));
+  });
+
+  test('el asistente solo acepta botones hacia pantallas de la app', () => {
+    const r = parseActions('Ve a pedir ayuda. [[ir:/mentoria/nueva|Pedir ayuda]] [[ir:https://malicioso.com|Clic]] [[ir:/admin|Admin]]');
+    assert.deepEqual(r.actions, [{ to: '/mentoria/nueva', label: 'Pedir ayuda' }]);
+    assert.equal(r.reply, 'Ve a pedir ayuda.');
+  });
+
+  test('con clave usa la IA y, si la IA falla, vuelve al modo guía', async () => {
+    const { token } = await login('asistente.ia@ulasalle.edu.pe');
+    const realFetch = globalThis.fetch;
+    config.anthropicApiKey = 'clave-de-prueba';
+    try {
+      let enviado: any = null;
+      globalThis.fetch = (async (_url: any, init: any) => {
+        enviado = JSON.parse(init.body);
+        return new Response(JSON.stringify({ content: [{ type: 'text', text: 'Claro, crea tu semillero así. [[ir:/comunidades/nueva|Crear comunidad]]' }] }), { status: 200 });
+      }) as any;
+      const ok = await call(token, 'POST', '/api/assistant', { messages: [{ role: 'user', content: 'quiero un semillero de IA' }] });
+      assert.equal(ok.json().mode, 'ia');
+      assert.deepEqual(ok.json().actions, [{ to: '/comunidades/nueva', label: 'Crear comunidad' }]);
+      assert.ok(!JSON.stringify(enviado).includes('asistente.ia@'), 'no se envía el correo del usuario a la IA');
+
+      globalThis.fetch = (async () => new Response('caído', { status: 529 })) as any;
+      const caida = await call(token, 'POST', '/api/assistant', { messages: [{ role: 'user', content: 'como pido ayuda' }] });
+      assert.equal(caida.statusCode, 200);
+      assert.equal(caida.json().mode, 'guia');
+    } finally {
+      globalThis.fetch = realFetch;
+      config.anthropicApiKey = '';
+    }
   });
 });

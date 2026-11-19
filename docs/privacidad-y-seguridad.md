@@ -28,6 +28,7 @@
 - Política de privacidad pública en `/privacidad`, accesible sin iniciar sesión.
 - Derecho de supresión: desde Perfil, "Eliminar mi cuenta" borra al usuario y sus datos (`DELETE /api/me`). Lo publicado en comunidades y retos queda sin autor.
 - Derecho de rectificación: el estudiante edita su perfil en cualquier momento.
+- Asistente Juanita: en modo con IA solo se envía a Anthropic el texto de la conversación, nunca nombre ni correo, y no se guarda; una prueba automática verifica que el correo no viaje a la IA. Los botones que propone la IA se filtran contra una lista de pantallas permitidas.
 - Pruebas automáticas que lo verifican: "sin consentimiento de datos no se crea la cuenta" y "el estudiante puede eliminar su cuenta y sus datos".
 
 Para el piloto con universidades queda pendiente el acuerdo con cada una sobre el uso de su nombre y de sus dominios de correo.

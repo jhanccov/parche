@@ -7,4 +7,7 @@ export const config = {
   smtpUrl: process.env.SMTP_URL ?? '',
   mailFrom: process.env.MAIL_FROM ?? 'Parche <no-reply@parche.app>',
   webOrigin: process.env.WEB_ORIGIN ?? true,
+  // Asistente Juanita: sin clave responde en modo guía; con clave usa la API de Claude.
+  anthropicApiKey: process.env.ANTHROPIC_API_KEY ?? '',
+  anthropicModel: process.env.ANTHROPIC_MODEL ?? 'claude-haiku-5-5',
 };

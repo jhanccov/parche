@@ -19,6 +19,7 @@ import messageRoutes from './routes/messages.js';
 import mapRoutes from './routes/map.js';
 import impactRoutes from './routes/impact.js';
 import reportRoutes from './routes/reports.js';
+import assistantRoutes from './routes/assistant.js';
 
 declare module '@fastify/jwt' {
   interface FastifyJWT {
@@ -83,6 +84,7 @@ export async function buildApp() {
   await app.register(mapRoutes, { prefix: '/api/map' });
   await app.register(impactRoutes, { prefix: '/api/impact' });
   await app.register(reportRoutes, { prefix: '/api/reports' });
+  await app.register(assistantRoutes, { prefix: '/api/assistant' });
 
   // En producción la misma API sirve la app web compilada (un solo servicio).
   const webDist = process.env.WEB_DIST ? resolve(process.env.WEB_DIST) : '';

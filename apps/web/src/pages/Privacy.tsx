@@ -29,6 +29,14 @@ export default function Privacy() {
       </ul>
       <p>No vendemos ni cedemos tus datos a terceros. El código de acceso se envía por correo mediante un proveedor de envío (Brevo).</p>
 
+      <h2>Asistente Juanita</h2>
+      <p>
+        Juanita responde dudas sobre cómo usar Parche. En modo guía, las respuestas salen de la propia app y tus
+        preguntas no salen de nuestro servidor. Si el modo con IA está activado, el texto de tus preguntas y de la
+        conversación se envía a Anthropic (Claude) solo para generar la respuesta: no enviamos tu nombre, tu correo
+        ni otros datos de tu cuenta, y Parche no guarda las conversaciones. No escribas datos personales en el chat.
+      </p>
+
       <h2>Tus derechos</h2>
       <p>
         Puedes acceder a tus datos, corregirlos desde tu perfil y eliminar tu cuenta en cualquier momento desde

@@ -22,7 +22,8 @@ Feria "Apps que transforman mi comunidad", Escuela Profesional de Ingeniería de
 
 - Monorepo con API (Node 22, TypeScript, Fastify 5, PostgreSQL 16, Zod, JWT) y web (React 18, Vite, PWA con Workbox, Leaflet).
 - Validación de entradas con Zod, límite de intentos por correo, códigos de un solo uso con vencimiento y hash, SQL parametrizado.
-- 12 pruebas de integración: acceso solo con correo La Salle, consentimiento obligatorio, código incorrecto, comunidades, mentoría con horas, retos interuniversitarios, impacto, privacidad del mapa, límite por correo y eliminación de cuenta.
+- Asistente Juanita (modo guía y modo con IA de Claude, con respaldo automático si la IA falla).
+- 15 pruebas de integración: acceso solo con correo La Salle, consentimiento obligatorio, código incorrecto, comunidades, mentoría con horas, retos interuniversitarios, impacto, privacidad del mapa, límite por correo, eliminación de cuenta y el asistente (modo guía, modo IA, respaldo y filtro de enlaces).
 - Despliegue con Docker en Render (una sola imagen, la API sirve la web).
 - Historial de commits de ambos integrantes.
 

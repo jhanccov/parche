@@ -4,6 +4,7 @@ import { Home, Map, Users, HandHelping, Mountain, Plus, Sparkles, Share2, LifeBu
 import { useAuth } from '../lib/auth';
 import { shareLink } from '../lib/fx';
 import { Avatar } from './ui';
+import Assistant from './Assistant';
 
 const TABS = [
   { to: '/', label: 'Inicio', icon: Home, end: true },
@@ -89,6 +90,8 @@ export default function Layout() {
           </button>
         </div>
       </div>
+
+      <Assistant />
 
       <nav className="tabbar" aria-label="Navegación principal">
         {TABS.map(({ to, label, icon: Icon, end }) => (
