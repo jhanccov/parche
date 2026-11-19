@@ -66,9 +66,14 @@ export function ProfileForm({ onDone, submitLabel }: { onDone: () => void; submi
 
 export default function Onboarding() {
   const nav = useNavigate();
+  useEffect(() => { window.scrollTo(0, 0); }, []);
   return (
     <div className="page narrow">
       <img src="/logo.png" alt="Parche" className="login-logo" />
+      <figure className="mascot-hello">
+        <img src="/img/mascota-juanita.webp" alt="Juanita, la mascota de la Universidad de La Salle, chocando los cinco" />
+        <figcaption>Juanita, la mascota de La Salle Bogotá, te da la bienvenida</figcaption>
+      </figure>
       <h1>Arma tu perfil</h1>
       <p className="muted">Tu perfil muestra lo que sabes y lo que quieres aprender, no fotos. Así conectamos por propósito.</p>
       <ProfileForm onDone={() => nav('/')} submitLabel="Empezar" />

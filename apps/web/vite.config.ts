@@ -15,7 +15,7 @@ export default defineConfig({
         scope: '/',
         description: 'Comunidades, mentoría entre pares y retos del territorio para estudiantes La Salle de Colombia y Perú',
         lang: 'es',
-        theme_color: '#033259',
+        theme_color: '#2B3682',
         background_color: '#FBF7EE',
         display: 'standalone',
         start_url: '/',
@@ -24,8 +24,8 @@ export default defineConfig({
           { src: '/icon-512.png', sizes: '512x512', type: 'image/png', purpose: 'any maskable' },
         ],
         screenshots: [
-          { src: '/img/cat-territorio.jpg', sizes: '800x268', type: 'image/jpeg', form_factor: 'wide', label: 'Retos del territorio' },
-          { src: '/img/ayuda-mentoria.jpg', sizes: '800x533', type: 'image/jpeg', form_factor: 'narrow', label: 'Mentoría entre pares' },
+          { src: '/img/portada-colombia.jpg', sizes: '2200x1466', type: 'image/jpeg', form_factor: 'wide', label: 'Estudiantes de ULASALLE en La Salle Bogotá' },
+          { src: '/img/captura-inicio.jpg', sizes: '780x1688', type: 'image/jpeg', form_factor: 'narrow', label: 'Inicio de Parche' },
         ],
         shortcuts: [
           { name: 'Pedir ayuda', short_name: 'Ayuda', description: 'Pide ayuda y le llega a quien sabe del tema', url: '/mentoria/nueva', icons: [{ src: '/icon-192.png', sizes: '192x192' }] },

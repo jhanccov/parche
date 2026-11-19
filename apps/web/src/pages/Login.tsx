@@ -1,10 +1,10 @@
 import { FormEvent, useEffect, useState } from 'react';
-import { Navigate, useNavigate } from 'react-router-dom';
+import { Link, Navigate, useNavigate } from 'react-router-dom';
 import { ShieldCheck } from 'lucide-react';
 import { api } from '../lib/api';
 import { setThemeColor } from '../lib/fx';
 import { useAuth } from '../lib/auth';
-import { Avatar, ErrorMsg } from '../components/ui';
+import { Avatar, ErrorMsg, Flag } from '../components/ui';
 
 const VERBS = ['Aprende', 'Crea', 'Conecta', 'Transforma'];
 const BUBBLES = ['💻', '📐', '🤝', '🏔️', '🚀', '🎭', '⚽', '🔬', '🌱', '☁️'];
@@ -16,6 +16,7 @@ export default function Login() {
   const nav = useNavigate();
   const [email, setEmail] = useState('');
   const [code, setCode] = useState('');
+  const [consent, setConsent] = useState(false);
   const [step, setStep] = useState<'email' | 'code'>('email');
   const [devCode, setDevCode] = useState<string | null>(null);
   const [err, setErr] = useState<string | null>(null);
@@ -60,7 +61,7 @@ export default function Login() {
     setBusy(true);
     setErr(null);
     try {
-      const r = await api<{ token: string; needsProfile: boolean }>('/auth/verify', { body: { email, code } });
+      const r = await api<{ token: string; needsProfile: boolean }>('/auth/verify', { body: { email, code, consent } });
       await signIn(r.token);
       nav(r.needsProfile ? '/bienvenida' : '/');
     } catch (e: any) {
@@ -81,11 +82,16 @@ export default function Login() {
       <div className="bubbles" aria-hidden>
         {BUBBLES.map((b, i) => <span key={i} style={{ left: `${(i * 37) % 92}%`, animationDelay: `${-i * 1.7}s`, animationDuration: `${13 + (i % 4) * 3}s` }}>{b}</span>)}
       </div>
+      <figure className="login-cover">
+        <img src="/img/portada-colombia.jpg" alt="Delegación de ULASALLE Arequipa en la Universidad de La Salle, Bogotá, con las banderas del Perú, La Salle Internacional y Arequipa" />
+        <figcaption><Flag country="Perú" /> <Flag country="Colombia" /> Estudiantes de ULASALLE Arequipa en La Salle Bogotá, octubre de 2026</figcaption>
+      </figure>
       <div className="login-hero">
         <span className="wordmark big">parche<i aria-hidden>✦</i></span>
         <h1><span className="verb" key={verb}>{VERBS[verb]}</span><br />con tu parche La Salle</h1>
         <p>Comunidades, mentoría entre pares y retos reales con estudiantes de Perú y Colombia.</p>
         <div className="login-tags"><span>👥 Comunidades</span><span>🤝 Mentoría</span><span>🏔️ Retos</span></div>
+        <p className="login-countries"><Flag country="Perú" size={22} /> Perú <Flag country="Colombia" size={22} /> Colombia</p>
       </div>
 
       <div className="card login-card">
@@ -94,6 +100,10 @@ export default function Login() {
             <label htmlFor="email">Tu correo institucional</label>
             <input id="email" type="email" required value={email} onChange={(e) => setEmail(e.target.value)} placeholder="nombre@ulasalle.edu.pe" autoComplete="email" />
             <ErrorMsg msg={err} />
+            <label className="consent">
+              <input type="checkbox" required checked={consent} onChange={(e) => setConsent(e.target.checked)} />
+              <span>Acepto la <Link to="/privacidad">política de privacidad</Link> y el tratamiento de mis datos según la Ley N.° 29733 (Perú) y la Ley 1581 de 2012 (Colombia).</span>
+            </label>
             <button className="btn gold block big" disabled={busy}>{busy ? 'Enviando...' : 'Recibir mi código'}</button>
             <p className="muted small"><ShieldCheck size={14} /> Solo estudiantes de la red La Salle. Nadie ve tu ubicación.</p>
           </form>

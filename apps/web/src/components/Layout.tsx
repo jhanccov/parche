@@ -17,7 +17,7 @@ export default function Layout() {
   const { me } = useAuth();
   const [open, setOpen] = useState(false);
   const loc = useLocation();
-  useEffect(() => setOpen(false), [loc.pathname]);
+  useEffect(() => { setOpen(false); window.scrollTo(0, 0); }, [loc.pathname]);
 
   return (
     <div className="shell">

@@ -4,15 +4,16 @@ import { CalendarDays, HandHelping, Heart, MapPin, Mountain, Plus, Share2, Users
 import { useAuth } from '../lib/auth';
 import { useApi } from '../lib/useApi';
 import { api } from '../lib/api';
-import { CATEGORIES, flag, when } from '../lib/format';
+import { CATEGORIES, when } from '../lib/format';
+import { Flag } from '../components/ui';
 import { burst, setThemeColor, shareLink } from '../lib/fx';
 
 const PROMPTS = ['¿Qué aprendemos hoy?', 'Tu parche te está esperando', 'Ayuda a alguien y suma puntos', 'Arma equipo para un reto real'];
 
 // Foto sobre degradado: la imagen manda, el overlay garantiza lectura.
 // Si la foto falla, queda el navy de fondo y el texto sigue legible.
-const photo = (img?: string, overlay = 'linear-gradient(180deg, rgba(3,20,35,0) 35%, rgba(3,20,35,0.72))') =>
-  img ? { backgroundColor: '#0B2A4B', backgroundImage: `${overlay}, url(${img})` } as const : {};
+const photo = (img?: string, overlay = 'linear-gradient(180deg, rgba(30,35,68,0) 35%, rgba(30,35,68,0.72))') =>
+  img ? { backgroundColor: '#2B3682', backgroundImage: `${overlay}, url(${img})` } as const : {};
 
 type Item =
   | { kind: 'event'; key: string; d: any }
@@ -24,6 +25,7 @@ type Item =
 const INVITES: Item[] = [
   { kind: 'invite', key: 'inv-crear', d: { title: 'Crea el parche de tu carrera', text: 'Un club, un semillero o un grupo de estudio. Te guiamos paso a paso hasta que esté activo.', cta: 'Crear comunidad', to: '/comunidades/nueva', img: '/img/invite-crear.jpg' } },
   { kind: 'invite', key: 'inv-ayuda', d: { title: '¿Te trabaste en un curso?', text: 'Pide ayuda y le llega a quien domina el tema, en tu sede o en otro país.', cta: 'Pedir ayuda', to: '/mentoria/nueva', img: '/img/invite-ayuda.jpg' } },
+  { kind: 'invite', key: 'inv-juanita', d: { title: '¡Choca esos cinco!', text: 'Juanita, la mascota de La Salle Bogotá, celebra cada hora de mentoría. Ayuda a alguien hoy y gana tu insignia de Mentor.', cta: 'Quiero ayudar', to: '/mentoria', img: '/img/mascota-juanita.webp' } },
   { kind: 'invite', key: 'inv-share', d: { title: 'Trae a tu salón', text: 'Mientras más compañeros entren, más rápido encuentras ayuda y equipo.', cta: 'Compartir Parche', share: true, img: '/img/invite-compartir.jpg' } },
 ];
 
@@ -75,7 +77,8 @@ export default function Home() {
     items.forEach((it, i) => {
       out.push(it);
       if (i === 2) out.push(INVITES[0]);
-      if (i === 6) out.push(INVITES[2]);
+      if (i === 4) out.push(INVITES[2]);
+      if (i === 8) out.push(INVITES[3]);
     });
     for (const inv of INVITES) if (!out.includes(inv)) out.push(inv);
     return out;
@@ -123,7 +126,13 @@ export default function Home() {
 
   return (
     <div className="home">
-      <section className="home-hero">
+      <section
+        className="home-hero home-cover"
+        style={photo('/img/portada-colombia.jpg', 'linear-gradient(180deg, rgba(30,35,68,0.15) 0%, rgba(30,35,68,0.05) 35%, rgba(30,35,68,0.88) 100%)')}
+        role="img"
+        aria-label="Delegación de ULASALLE Arequipa en la Universidad de La Salle, Bogotá, con las banderas del Perú, La Salle Internacional y Arequipa"
+      >
+        <span className="cover-tag"><Flag country="Perú" /> Perú y <Flag country="Colombia" /> Colombia, una sola red La Salle</span>
         <h1>Hola, {first} <span className="wave" aria-hidden>👋</span></h1>
         <p className="prompt" key={prompt} aria-live="polite">{PROMPTS[prompt]}</p>
       </section>
@@ -217,7 +226,7 @@ export default function Home() {
               <article key={it.key} className="fcard" style={{ background: CATEGORIES.territorio.grad, ...photo(CATEGORIES.territorio.img) }}>
                 <span className="fbadge"><Mountain size={14} /> Reto del territorio</span>
                 <div className="fbody">
-                  <p className="fmeta">{flag(d.country)} {d.territory}</p>
+                  <p className="fmeta"><Flag country={d.country} /> {d.territory}</p>
                   <h3><Link to={`/retos/${d.id}`}>{d.title}</Link></h3>
                   <p className="fdesc">{d.summary}</p>
                   <p className="fmeta">{d.participants ? `${d.participants} estudiantes en ${d.teams} equipos` : 'Aún sin equipo, puedes ser el primero'}</p>
