@@ -1,5 +1,6 @@
 import { createContext, ReactNode, useCallback, useContext, useEffect, useState } from 'react';
 import { api, getToken, Me, setToken } from './api';
+import { clearApiCache } from './useApi';
 
 type Ctx = {
   me: Me | null;
@@ -35,12 +36,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, [refresh]);
 
   const signIn = async (token: string) => {
+    clearApiCache();
     setToken(token);
     setLoading(true);
     await refresh();
   };
 
   const signOut = () => {
+    clearApiCache();
     setToken(null);
     setMe(null);
   };

@@ -1,11 +1,11 @@
 import { useEffect, useMemo, useState, MouseEvent } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { CalendarDays, HandHelping, Heart, MapPin, Mountain, Plus, Share2, Users, UserPlus, Check, Hand } from 'lucide-react';
+import { CalendarDays, HandHelping, Heart, MapPin, Mountain, Plus, Share2, Users, UserPlus, Check, Hand, MessageCircle, ChevronRight, Rocket } from 'lucide-react';
 import { useAuth } from '../lib/auth';
 import { useApi } from '../lib/useApi';
 import { api } from '../lib/api';
-import { CATEGORIES, when } from '../lib/format';
-import { Flag } from '../components/ui';
+import { ago, CATEGORIES, when } from '../lib/format';
+import { Avatar, Flag, Loading } from '../components/ui';
 import { burst, setThemeColor, shareLink } from '../lib/fx';
 
 const PROMPTS = ['¿Qué aprendemos hoy?', 'Tu parche te está esperando', 'Ayuda a alguien y suma puntos', 'Arma equipo para un reto real'];
@@ -46,11 +46,8 @@ export default function Home() {
   const [prompt, setPrompt] = useState(0);
   const [toast, setToast] = useState<string | null>(null);
 
-  useEffect(() => {
-    document.body.classList.add('dark-page');
-    setThemeColor('dark');
-    return () => { document.body.classList.remove('dark-page'); setThemeColor('default'); };
-  }, []);
+  useEffect(() => { setThemeColor('default'); }, []);
+  const [liked, setLiked] = useState<string | null>(null);
 
   useEffect(() => {
     if (window.matchMedia?.('(prefers-reduced-motion: reduce)').matches) return;
@@ -89,25 +86,31 @@ export default function Home() {
     if (r === 'copied') setToast('Enlace copiado');
   }
 
-  async function rsvp(e: MouseEvent, d: any) {
+  // Acciones optimistas: la interfaz responde al instante y se corrige si el servidor falla.
+  async function rsvp(e: MouseEvent | null, d: any, fromDoubleTap = false) {
+    const prev = events.data;
+    const on = !d.rsvp;
+    if (fromDoubleTap && !on) return;
+    events.setData((list) => (list ?? []).map((x) => (x.id === d.id ? { ...x, rsvp: on, going: x.going + (on ? 1 : -1) } : x)));
+    if (on) { e?.currentTarget && burst(e.currentTarget as Element); setLiked(d.id); setTimeout(() => setLiked(null), 800); }
     try {
-      const btn = e.currentTarget;
-      const r = await api<{ rsvp: boolean }>(`/events/${d.id}/rsvp`, { method: 'POST' });
-      if (r.rsvp) burst(btn);
-      events.setData((list) => (list ?? []).map((x) => (x.id === d.id ? { ...x, rsvp: r.rsvp, going: x.going + (r.rsvp ? 1 : -1) } : x)));
+      await api(`/events/${d.id}/rsvp`, { method: 'POST' });
     } catch (err: any) {
+      events.setData(prev);
       if (err?.name !== 'AbortError') setToast(err.message);
     }
   }
 
   async function join(e: MouseEvent, d: any) {
-    const btn = e.currentTarget;
+    if (d.joined) return nav(`/comunidades/${d.id}`);
+    const prev = comms.data;
+    burst(e.currentTarget);
+    comms.setData((list) => (list ?? []).map((x) => (x.id === d.id ? { ...x, joined: true, members: x.members + 1 } : x)));
+    setToast(`Ya eres parte de ${d.name}`);
     try {
       await api(`/communities/${d.id}/join`, { method: 'POST' });
-      burst(btn);
-      setToast(`Ya eres parte de ${d.name}`);
-      comms.setData((list) => (list ?? []).map((x) => (x.id === d.id ? { ...x, joined: true, members: x.members + 1 } : x)));
     } catch (err: any) {
+      comms.setData(prev);
       setToast(err.message);
     }
   }
@@ -155,27 +158,43 @@ export default function Home() {
         })}
       </div>
 
+      {/* Compositor al estilo LinkedIn: la acción principal siempre a un toque */}
+      <div className="composer">
+        <Avatar name={me?.name} size={42} />
+        <Link to="/mentoria/nueva" className="composer-input">¿En qué necesitas ayuda hoy?</Link>
+        <div className="composer-actions">
+          <Link to="/mentoria/nueva"><HandHelping size={18} /> Pedir ayuda</Link>
+          <Link to="/comunidades/nueva"><Rocket size={18} /> Comunidad</Link>
+          <Link to="/retos"><Mountain size={18} /> Reto</Link>
+        </div>
+      </div>
+
       <h2 className="feed-title">Para ti</h2>
 
       <div className="feed">
+        {!events.data && !comms.data && <Loading rows={2} />}
         {feed.map((it) => {
           if (it.kind === 'event') {
             const d = it.d; const cat = CATEGORIES[d.category];
             const to = d.community_id ? `/comunidades/${d.community_id}` : '/';
             return (
-              <article key={it.key} className="fcard" style={{ background: cat?.grad ?? CATEGORIES.tecnologia.grad, ...photo(cat?.img) }}>
-                <span className="fbadge"><CalendarDays size={14} /> Evento</span>
-                <div className="fbody">
-                  <h3><Link to={to}>{d.title}</Link></h3>
-                  <p className="fmeta">{when(d.starts_at)}</p>
-                  <p className="fmeta"><MapPin size={14} /> {d.place || 'Lugar por definir'}{d.community ? ` · ${d.community}` : ''}</p>
+              <article key={it.key} className="post">
+                <header className="post-head">
+                  <span className="post-ico gold"><CalendarDays size={18} /></span>
+                  <div><Link to={to}><strong>{d.community ?? 'Evento'}</strong></Link><small>Evento · {when(d.starts_at)}</small></div>
+                </header>
+                <div className="post-media" style={{ backgroundImage: `url(${cat?.img ?? CATEGORIES.tecnologia.img})` }} onDoubleClick={() => rsvp(null, d, true)} role="img" aria-label={`Imagen del evento ${d.title}. Doble toque para marcar que vas.`}>
+                  {liked === d.id && <Heart className="big-heart" size={96} fill="currentColor" aria-hidden />}
                 </div>
-                <div className="frail">
-                  <button className={`fbtn ${d.rsvp ? 'on' : ''}`} onClick={(e) => rsvp(e, d)} aria-pressed={d.rsvp} aria-label={d.rsvp ? 'Ya no voy' : 'Voy'}>
-                    <Heart size={26} fill={d.rsvp ? 'currentColor' : 'none'} />
-                  </button>
-                  <span className="fcount">{d.going}<small>van</small></span>
-                  <button className="fbtn" onClick={(e) => share(e, d.title)} aria-label="Compartir"><Share2 size={24} /></button>
+                <div className="post-actions">
+                  <button className={`pa ${d.rsvp ? 'on' : ''}`} onClick={(e) => rsvp(e, d)} aria-pressed={d.rsvp}><Heart size={24} fill={d.rsvp ? 'currentColor' : 'none'} /> {d.rsvp ? 'Voy' : 'Asistiré'}</button>
+                  <Link className="pa" to={to}><MessageCircle size={24} /> Comentar</Link>
+                  <button className="pa" onClick={(e) => share(e, d.title)}><Share2 size={22} /> Compartir</button>
+                </div>
+                <div className="post-body">
+                  <p className="post-likes">{d.going} {d.going === 1 ? 'persona va' : 'personas van'}</p>
+                  <h3><Link to={to}>{d.title}</Link></h3>
+                  <p className="post-meta"><MapPin size={14} /> {d.place || 'Lugar por definir'}</p>
                 </div>
               </article>
             );
@@ -184,20 +203,22 @@ export default function Home() {
             const d = it.d; const cat = CATEGORIES[d.category];
             const pct = Math.min(100, Math.round((d.members / Math.max(1, d.goal_members)) * 100));
             return (
-              <article key={it.key} className="fcard" style={{ background: cat?.grad, ...photo(cat?.img) }}>
-                <span className="fbadge"><Users size={14} /> Comunidad · {cat?.label}</span>
-                <div className="fbody">
-                  <h3><Link to={`/comunidades/${d.id}`}>{d.name}</Link></h3>
-                  <p className="fdesc">{d.description}</p>
-                  <div className="fbar"><span style={{ width: `${Math.max(6, pct)}%` }} /></div>
-                  <p className="fmeta">{d.members} de {d.goal_members} miembros · {d.university}</p>
+              <article key={it.key} className="post">
+                <header className="post-head">
+                  <span className="post-ico"><Users size={18} /></span>
+                  <div><Link to={`/comunidades/${d.id}`}><strong>{d.name}</strong></Link><small>{['Comunidad', cat?.label, d.university].filter(Boolean).join(' · ')}</small></div>
+                  <button className={`follow ${d.joined ? 'on' : ''}`} onClick={(e) => join(e, d)}>{d.joined ? 'Miembro' : 'Unirme'}</button>
+                </header>
+                <Link to={`/comunidades/${d.id}`} className="post-media short" style={{ backgroundImage: `url(${cat?.img})` }} aria-label={`Ver ${d.name}`} />
+                <div className="post-body">
+                  <p className="post-text">{d.description}</p>
+                  <div className="post-progress"><span style={{ width: `${Math.max(6, pct)}%` }} /></div>
+                  <p className="post-meta">{d.members} de {d.goal_members} miembros para activarse</p>
                 </div>
-                <div className="frail">
-                  <button className={`fbtn ${d.joined ? 'on' : ''}`} onClick={(e) => !d.joined && join(e, d)} aria-label={d.joined ? 'Ya eres miembro' : 'Unirme'}>
-                    {d.joined ? <Check size={26} /> : <UserPlus size={26} />}
-                  </button>
-                  <span className="fcount">{d.joined ? 'Dentro' : 'Unirme'}</span>
-                  <button className="fbtn" onClick={(e) => share(e, d.name, `/comunidades/${d.id}`)} aria-label="Compartir"><Share2 size={24} /></button>
+                <div className="post-actions">
+                  <button className={`pa ${d.joined ? 'on' : ''}`} onClick={(e) => join(e, d)}>{d.joined ? <Check size={22} /> : <UserPlus size={22} />} {d.joined ? 'Eres miembro' : 'Unirme'}</button>
+                  <Link className="pa" to={`/comunidades/${d.id}`}><MessageCircle size={22} /> Conversación</Link>
+                  <button className="pa" onClick={(e) => share(e, d.name, `/comunidades/${d.id}`)}><Share2 size={22} /> Compartir</button>
                 </div>
               </article>
             );
@@ -205,17 +226,19 @@ export default function Home() {
           if (it.kind === 'help') {
             const d = it.d;
             return (
-              <article key={it.key} className="fcard" style={{ ...photo('/img/ayuda-mentoria.jpg') }}>
-                <span className="fbadge"><HandHelping size={14} /> Pide ayuda en {d.topic}</span>
-                <div className="fbody">
+              <article key={it.key} className="post">
+                <header className="post-head">
+                  <Avatar name={d.author} size={40} />
+                  <div><strong>{d.author?.split(' ').slice(0, 2).join(' ')}</strong><small>{[d.author_career, d.author_university, d.created_at && ago(d.created_at)].filter(Boolean).join(' · ')}</small></div>
+                  <span className="post-tag">{d.topic}</span>
+                </header>
+                <div className="post-body">
                   <h3><Link to={`/mentoria/${d.id}`}>{d.title}</Link></h3>
-                  {d.detail && <p className="fdesc">{d.detail}</p>}
-                  <p className="fmeta">{d.author?.split(' ')[0]} · {d.author_career} · {d.author_university}</p>
+                  {d.detail && <p className="post-text">{d.detail}</p>}
                 </div>
-                <div className="frail">
-                  <button className="fbtn gold" onClick={(e) => offer(e, d)} aria-label="Ofrezco ayuda"><HandHelping size={26} /></button>
-                  <span className="fcount">Ayudo</span>
-                  <button className="fbtn" onClick={(e) => share(e, `Alguien necesita ayuda en ${d.topic}`)} aria-label="Compartir"><Share2 size={24} /></button>
+                <div className="post-actions">
+                  <button className="pa primary" onClick={(e) => offer(e, d)}><HandHelping size={22} /> Ofrezco ayuda</button>
+                  <button className="pa" onClick={(e) => share(e, `Alguien necesita ayuda en ${d.topic}`)}><Share2 size={22} /> Compartir</button>
                 </div>
               </article>
             );
@@ -223,18 +246,20 @@ export default function Home() {
           if (it.kind === 'challenge') {
             const d = it.d;
             return (
-              <article key={it.key} className="fcard" style={{ background: CATEGORIES.territorio.grad, ...photo(CATEGORIES.territorio.img) }}>
-                <span className="fbadge"><Mountain size={14} /> Reto del territorio</span>
-                <div className="fbody">
-                  <p className="fmeta"><Flag country={d.country} /> {d.territory}</p>
+              <article key={it.key} className="post">
+                <header className="post-head">
+                  <span className="post-ico navy"><Mountain size={18} /></span>
+                  <div><Link to={`/retos/${d.id}`}><strong>Reto del territorio</strong></Link><small><Flag country={d.country} /> {d.territory}</small></div>
+                </header>
+                <Link to={`/retos/${d.id}`} className="post-media short" style={{ backgroundImage: `url(${CATEGORIES.territorio.img})` }} aria-label={`Ver reto ${d.title}`} />
+                <div className="post-body">
                   <h3><Link to={`/retos/${d.id}`}>{d.title}</Link></h3>
-                  <p className="fdesc">{d.summary}</p>
-                  <p className="fmeta">{d.participants ? `${d.participants} estudiantes en ${d.teams} equipos` : 'Aún sin equipo, puedes ser el primero'}</p>
+                  <p className="post-text">{d.summary}</p>
+                  <p className="post-meta">{d.participants ? `${d.participants} estudiantes en ${d.teams} equipos` : 'Aún sin equipo, puedes ser el primero'}</p>
                 </div>
-                <div className="frail">
-                  <Link className="fbtn gold" to={`/retos/${d.id}`} aria-label="Ver reto"><Mountain size={26} /></Link>
-                  <span className="fcount">Ver reto</span>
-                  <button className="fbtn" onClick={(e) => share(e, d.title, `/retos/${d.id}`)} aria-label="Compartir"><Share2 size={24} /></button>
+                <div className="post-actions">
+                  <Link className="pa primary" to={`/retos/${d.id}`}><Mountain size={22} /> Ver reto</Link>
+                  <button className="pa" onClick={(e) => share(e, d.title, `/retos/${d.id}`)}><Share2 size={22} /> Compartir</button>
                 </div>
               </article>
             );
@@ -242,17 +267,18 @@ export default function Home() {
           const d = it.d;
           const inner = (
             <>
-              <div className="fbody">
-                <h3 className="xl">{d.title}</h3>
-                <p className="fdesc">{d.text}</p>
-                <span className="fcta">{d.cta}</span>
-              </div>
+              <span className="promo-img" style={{ backgroundImage: `url(${d.img})` }} aria-hidden />
+              <span className="promo-text">
+                <strong>{d.title}</strong>
+                <small>{d.text}</small>
+                <span className="promo-cta">{d.cta} <ChevronRight size={16} /></span>
+              </span>
             </>
           );
           return d.share ? (
-            <button key={it.key} className="fcard invite" style={photo(d.img)} onClick={(e) => share(e, 'Únete a mi parche')}>{inner}</button>
+            <button key={it.key} className="promo" onClick={(e) => share(e, 'Únete a mi parche')}>{inner}</button>
           ) : (
-            <Link key={it.key} to={d.to!} className="fcard invite" style={photo(d.img)}>{inner}</Link>
+            <Link key={it.key} to={d.to!} className="promo">{inner}</Link>
           );
         })}
       </div>

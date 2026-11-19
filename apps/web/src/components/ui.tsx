@@ -39,8 +39,19 @@ export function Empty({ title, children }: { title: string; children?: ReactNode
   );
 }
 
-export function Loading() {
-  return <div className="loading">Cargando...</div>;
+// Esqueleto de carga: la forma del contenido aparece al instante, como en las redes sociales.
+export function Loading({ rows = 3 }: { rows?: number }) {
+  return (
+    <div className="skeleton-list" role="status" aria-label="Cargando">
+      {Array.from({ length: rows }, (_, i) => (
+        <div key={i} className="skeleton-card">
+          <div className="sk-row"><span className="sk sk-avatar" /><span className="sk sk-line w40" /></div>
+          <span className="sk sk-line w80" />
+          <span className="sk sk-line w60" />
+        </div>
+      ))}
+    </div>
+  );
 }
 
 export function ErrorMsg({ msg }: { msg: string | null }) {

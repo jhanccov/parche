@@ -5,6 +5,15 @@ import { useAuth } from '../lib/auth';
 import { shareLink } from '../lib/fx';
 import { Avatar } from './ui';
 import Assistant from './Assistant';
+import { prefetch } from '../lib/useApi';
+
+const PREFETCH: Record<string, string[]> = {
+  '/': ['/events', '/communities', '/help', '/challenges'],
+  '/comunidades': ['/communities?'],
+  '/mapa': ['/map'],
+  '/mentoria': ['/help?scope=para-mi'],
+  '/retos': ['/challenges'],
+};
 
 const TABS = [
   { to: '/', label: 'Inicio', icon: Home, end: true },
@@ -27,9 +36,34 @@ export default function Layout() {
   }, [open]);
   const first = me?.name?.split(' ')[0] ?? '';
 
+  // Precarga de las pestañas: al tocarlas el contenido ya está, como en Instagram.
+  useEffect(() => {
+    const t = setTimeout(() => Object.values(PREFETCH).flat().forEach(prefetch), 600);
+    return () => clearTimeout(t);
+  }, []);
+
+  // Barra superior que se esconde al bajar y vuelve al subir.
+  const [hideTop, setHideTop] = useState(false);
+  useEffect(() => {
+    let last = window.scrollY;
+    let ticking = false;
+    const onScroll = () => {
+      if (ticking) return;
+      ticking = true;
+      requestAnimationFrame(() => {
+        const y = window.scrollY;
+        if (Math.abs(y - last) > 6) { setHideTop(y > last && y > 120); last = y; }
+        ticking = false;
+      });
+    };
+    window.addEventListener('scroll', onScroll, { passive: true });
+    return () => window.removeEventListener('scroll', onScroll);
+  }, []);
+  useEffect(() => setHideTop(false), [loc.pathname]);
+
   return (
     <div className="shell">
-      <header className="topbar">
+      <header className={`topbar ${hideTop && !open ? 'hide' : ''}`}>
         <Link to="/" className="brand" aria-label="Parche, inicio">
           <span className="wordmark">parche<i aria-hidden><Sparkle size={16} fill="currentColor" strokeWidth={0} /></i></span>
         </Link>
@@ -47,7 +81,9 @@ export default function Layout() {
         </div>
       </header>
       <main className="content">
-        <Outlet />
+        <div className="page-anim" key={loc.pathname}>
+          <Outlet />
+        </div>
       </main>
 
       {open && <button className="sheet-backdrop" aria-label="Cerrar" onClick={() => setOpen(false)} />}
@@ -95,7 +131,7 @@ export default function Layout() {
 
       <nav className="tabbar" aria-label="Navegación principal">
         {TABS.map(({ to, label, icon: Icon, end }) => (
-          <NavLink key={to} to={to} end={end} className={({ isActive }) => (isActive ? 'on' : '')}>
+          <NavLink key={to} to={to} end={end} className={({ isActive }) => (isActive ? 'on' : '')} onPointerEnter={() => PREFETCH[to]?.forEach(prefetch)} onTouchStart={() => PREFETCH[to]?.forEach(prefetch)}>
             <Icon size={22} />
             <span>{label}</span>
           </NavLink>
