@@ -37,11 +37,12 @@ export default function Privacy() {
         ni otros datos de tu cuenta, y Parche no guarda las conversaciones. No escribas datos personales en el chat.
       </p>
 
-      <h2>Tech hoy</h2>
+      <h2>La Salle hoy</h2>
       <p>
-        Las noticias de tecnología vienen de Xataka, ENTER.CO, DEV Community y Hacker News. Nuestro servidor las descarga
+        Las noticias vienen de lasalle.org, de sitios web y canales de YouTube de universidades La Salle, y en la pestaña
+        Tecnología de Xataka, ENTER.CO, DEV Community y Hacker News. Nuestro servidor las descarga
         sin enviar ningún dato tuyo; para ordenarlas solo usamos, dentro de Parche, los temas que marcaste en tu perfil.
-        Las imágenes de las noticias se cargan desde el sitio de cada medio y, al abrir una nota, sales a su página.
+        Las imágenes se cargan desde el sitio de cada fuente y, al abrir una publicación o un video, sales a su página.
       </p>
 
       <h2>Tus derechos</h2>

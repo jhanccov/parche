@@ -172,20 +172,20 @@ export default function Home() {
       </div>
 
       {!!news.data?.items.length && (
-        <section className="tech-strip" aria-label="Tech hoy">
+        <section className="tech-strip" aria-label="La Salle hoy">
           <div className="tech-strip-head">
-            <h2><Newspaper size={18} /> Tech hoy</h2>
+            <h2><Newspaper size={18} /> La Salle hoy</h2>
             <Link to="/noticias">Ver todo <ChevronRight size={16} /></Link>
           </div>
           <div className="tech-scroll">
             {news.data.items.map((n) => (
               <a key={n.id} className="tech-card" href={n.url} target="_blank" rel="noopener noreferrer">
                 {n.image ? <NewsImage src={n.image} alt="" className="tech-img" /> : <span className="tech-img tech-ph" aria-hidden><Newspaper size={26} /></span>}
-                <span className="tech-src">{n.source}{n.forYou ? ' · Para ti' : ''}</span>
+                <span className="tech-src">{n.kind === 'video' ? 'Video · ' : ''}{n.source}{n.forYou ? ' · Para ti' : ''}</span>
                 <strong>{n.title}</strong>
               </a>
             ))}
-            <Link to="/noticias" className="tech-card more"><Newspaper size={22} /><strong>Más noticias de tecnología</strong></Link>
+            <Link to="/noticias" className="tech-card more"><Newspaper size={22} /><strong>Más de la red La Salle</strong></Link>
           </div>
         </section>
       )}

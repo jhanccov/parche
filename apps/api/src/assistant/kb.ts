@@ -17,7 +17,7 @@ export const ROUTES: Record<string, string> = {
   '/perfil': 'Mi perfil',
   '/constancia': 'Constancia de mentoría',
   '/privacidad': 'Política de privacidad',
-  '/noticias': 'Tech hoy',
+  '/noticias': 'La Salle hoy',
 };
 
 const go = (to: string, label = ROUTES[to]): Action => ({ label, to });
@@ -127,9 +127,9 @@ export const KB: Entry[] = [
   },
   {
     id: 'noticias',
-    keywords: ['noticias', 'tech hoy', 'novedades', 'que hay de nuevo', 'tecnologia actual', 'enterarme', 'actualidad', 'tendencias'],
-    answer: 'En "Tech hoy" (el ícono de periódico arriba) tienes noticias de tecnología de Xataka y ENTER.CO en español, artículos de DEV Community para devs y lo más comentado en Hacker News. Se ordenan según lo que marcaste en "Quiero aprender" y cada una enlaza a la nota original.',
-    actions: [go('/noticias'), go('/perfil', 'Ajustar mis temas')],
+    keywords: ['noticias', 'la salle hoy', 'tech hoy', 'novedades', 'que hay de nuevo', 'red la salle', 'otras universidades', 'videos', 'youtube', 'redes sociales', 'instagram', 'tecnologia actual', 'enterarme', 'actualidad'],
+    answer: 'En "La Salle hoy" (el ícono de periódico arriba) ves noticias de la red La Salle del mundo (lasalle.org y sitios de universidades La Salle), videos de sus canales de YouTube y, en la pestaña Tecnología, notas de Xataka, ENTER.CO, DEV Community y Hacker News. Cada publicación enlaza a la original. Instagram y otras redes necesitan autorización de cada universidad, por eso aún no se muestran.',
+    actions: [go('/noticias', 'La Salle hoy'), go('/perfil', 'Ajustar mis temas')],
   },
   {
     id: 'saludo',

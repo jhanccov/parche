@@ -630,3 +630,8 @@ body.dark-page { background: var(--night); color: var(--white); }
 .news-credits a { color: var(--navy2); font-weight: 700; }
 .tech-ph { display: grid; place-items: center; background: var(--navy); color: var(--sun); }
 .tech-card { align-self: flex-start; }
+
+.news-video { position: relative; display: block; flex: 0 0 auto; }
+.news-play { position: absolute; inset: 0; margin: auto; width: 58px; height: 58px; border-radius: 50%; display: grid; place-items: center; background: color-mix(in srgb, var(--night) 70%, transparent); color: var(--white); }
+.news-video:hover .news-play { background: var(--gold); color: var(--night); }
+@media (min-width: 700px) { .news-card.is-video .news-video { width: 240px; flex: 0 0 240px; } .news-card.is-video .news-video .news-img { width: 100%; height: 100%; } }

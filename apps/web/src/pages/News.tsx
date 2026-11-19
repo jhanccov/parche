@@ -1,5 +1,5 @@
 import { MouseEvent, useEffect, useState } from 'react';
-import { ExternalLink, Flame, Code2, Globe2, Newspaper, Share2, Sparkles } from 'lucide-react';
+import { ExternalLink, Cpu, Globe2, Newspaper, Play, Share2, Sparkles, Youtube } from 'lucide-react';
 import { useApi } from '../lib/useApi';
 import { ago } from '../lib/format';
 import { shareLink } from '../lib/fx';
@@ -7,15 +7,15 @@ import { Empty, Loading } from '../components/ui';
 
 export type News = {
   id: string; title: string; summary: string; url: string; image: string | null; source: string; sourceId: string;
-  group: 'es' | 'dev' | 'trend'; lang: 'es' | 'en'; publishedAt: string; topics: string[]; forYou: boolean;
+  group: 'lasalle' | 'video' | 'es' | 'dev' | 'trend'; kind?: 'video'; lang: 'es' | 'en'; publishedAt: string; topics: string[]; forYou: boolean;
 };
-type Resp = { items: News[]; topics: { id: string; label: string; mine: boolean }[]; sources: { id: string; name: string; site: string; ok: boolean; count: number }[]; updatedAt: number | null };
+type Resp = { items: News[]; topics: { id: string; label: string; mine: boolean }[]; sources: { id: string; name: string; site: string; ok: boolean; count: number }[]; updatedAt: number | null; hasVideos?: boolean };
 
 const TABS = [
   { id: 'all', label: 'Para ti', icon: Sparkles },
-  { id: 'es', label: 'En español', icon: Globe2 },
-  { id: 'dev', label: 'Para devs', icon: Code2 },
-  { id: 'trend', label: 'Tendencias', icon: Flame },
+  { id: 'lasalle', label: 'Red La Salle', icon: Globe2 },
+  { id: 'video', label: 'Videos', icon: Youtube },
+  { id: 'tech', label: 'Tecnología', icon: Cpu },
 ] as const;
 
 // Imagen externa del medio: si no carga, la tarjeta queda sin foto.
@@ -27,8 +27,13 @@ export function NewsImage({ src, alt, className }: { src: string | null; alt: st
 
 export function NewsCard({ n, onShare }: { n: News; onShare?: (e: MouseEvent, n: News) => void }) {
   return (
-    <article className="news-card">
-      <NewsImage src={n.image} alt="" className="news-img" />
+    <article className={`news-card ${n.kind === 'video' ? 'is-video' : ''}`}>
+      {n.kind === 'video' ? (
+        <a className="news-video" href={n.url} target="_blank" rel="noopener noreferrer" aria-label={`Ver video: ${n.title}`}>
+          <NewsImage src={n.image} alt="" className="news-img" />
+          <span className="news-play" aria-hidden><Play size={26} fill="currentColor" /></span>
+        </a>
+      ) : <NewsImage src={n.image} alt="" className="news-img" />}
       <div className="news-body">
         <p className="news-meta">
           <strong>{n.source}</strong> · {ago(n.publishedAt)}
@@ -38,7 +43,7 @@ export function NewsCard({ n, onShare }: { n: News; onShare?: (e: MouseEvent, n:
         <h3><a href={n.url} target="_blank" rel="noopener noreferrer">{n.title}</a></h3>
         {n.summary && <p className="news-summary">{n.summary}</p>}
         <div className="news-actions">
-          <a className="news-read" href={n.url} target="_blank" rel="noopener noreferrer">Leer en {n.source} <ExternalLink size={15} /></a>
+          <a className="news-read" href={n.url} target="_blank" rel="noopener noreferrer">{n.kind === 'video' ? 'Ver en YouTube' : `Leer en ${n.source}`} <ExternalLink size={15} /></a>
           {onShare && <button className="news-share" onClick={(e) => onShare(e, n)} aria-label="Compartir noticia"><Share2 size={18} /></button>}
         </div>
       </div>
@@ -64,13 +69,13 @@ export default function NewsPage() {
       <header className="news-head">
         <span className="post-ico gold"><Newspaper size={20} /></span>
         <div>
-          <h1>Tech hoy</h1>
-          <p className="muted">Lo nuevo en tecnología, ordenado según lo que quieres aprender.</p>
+          <h1>La Salle hoy</h1>
+          <p className="muted">Lo que pasa en la red La Salle del mundo, sus videos y lo nuevo en tecnología.</p>
         </div>
       </header>
 
       <div className="news-tabs" role="tablist">
-        {TABS.map(({ id, label, icon: Icon }) => (
+        {TABS.filter((t) => t.id !== 'video' || data?.hasVideos || tab === 'video').map(({ id, label, icon: Icon }) => (
           <button key={id} role="tab" aria-selected={tab === id} className={tab === id ? 'on' : ''} onClick={() => setTab(id)}><Icon size={16} /> {label}</button>
         ))}
       </div>
@@ -91,7 +96,7 @@ export default function NewsPage() {
       {data && (
         <p className="news-credits">
           Fuentes: {data.sources.map((s, i) => <span key={s.id}>{i ? ', ' : ''}<a href={s.site} target="_blank" rel="noopener noreferrer">{s.name}</a></span>)}.
-          Parche muestra titulares y resúmenes breves y enlaza siempre a la nota original.
+          Parche muestra titulares y resúmenes breves y enlaza siempre a la publicación original.
         </p>
       )}
       {toast && <div className="toast" role="status">{toast}</div>}

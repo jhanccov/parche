@@ -68,7 +68,7 @@ export default function Layout() {
           <span className="wordmark">parche<i aria-hidden><Sparkle size={16} fill="currentColor" strokeWidth={0} /></i></span>
         </Link>
         <div className="topbar-right">
-          <Link to="/noticias" className="icon-btn news-btn" aria-label="Tech hoy, noticias de tecnología" onPointerEnter={() => prefetch('/news?group=all&limit=40')}>
+          <Link to="/noticias" className="icon-btn news-btn" aria-label="La Salle hoy: noticias de la red La Salle y de tecnología" onPointerEnter={() => prefetch('/news?group=all&limit=40')}>
             <Newspaper size={20} />
           </Link>
           <Link to="/impacto" className="pill gold topbar-impact" aria-label="Impacto de la red">

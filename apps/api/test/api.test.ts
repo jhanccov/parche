@@ -1,5 +1,6 @@
 process.env.NODE_ENV = 'test';
 process.env.DEMO_MODE = 'true';
+process.env.NEWS_YOUTUBE_CHANNELS = 'La Salle Prueba TV|UCabcdefghijklmnopqrstuv';
 process.env.DATABASE_URL = process.env.TEST_DATABASE_URL ?? 'postgres://parche:parche@localhost:5432/parche_test';
 
 import { after, before, describe, test } from 'node:test';
@@ -230,6 +231,9 @@ describe('Parche API', () => {
       const u = String(url);
       if (u.includes('xataka')) return new Response(rss, { status: 200 });
       if (u.includes('enter.co')) return enterFalla ? new Response('error', { status: 500 }) : new Response(rss.replace(/xataka/g, 'enter'), { status: 200 });
+      if (u.includes('lasalle.org/wp-json')) return new Response(JSON.stringify([{ id: 7, link: 'https://www.lasalle.org/nota-red', date_gmt: '2026-11-18T09:00:00', title: { rendered: 'Jóvenes lasallistas de 12 países se reúnen en Roma' }, excerpt: { rendered: '<p>Encuentro internacional de la red.</p>' }, _embedded: { 'wp:featuredmedia': [{ source_url: 'https://www.lasalle.org/img.jpg' }] } }]), { status: 200 });
+      if (u.includes('youtube.com/feeds')) return new Response(`<?xml version="1.0"?><feed xmlns:yt="http://www.youtube.com/xml/schemas/2015" xmlns:media="http://search.yahoo.com/mrss/" xmlns="http://www.w3.org/2005/Atom"><entry><yt:videoId>abc123XYZ_-</yt:videoId><title>Bienvenida a cachimbos 2027</title><link rel="alternate" href="https://www.youtube.com/watch?v=abc123XYZ_-"/><published>2026-11-17T15:00:00+00:00</published><media:group><media:thumbnail url="https://i.ytimg.com/vi/abc123XYZ_-/hqdefault.jpg"/><media:description>Video oficial</media:description></media:group></entry></feed>`, { status: 200 });
+      if (u.includes('lasalle.edu.co') || u.includes('salleurl.edu')) return new Response('no', { status: 404 });
       if (u.includes('dev.to')) return new Response(JSON.stringify([{ id: 1, title: 'Build a REST API with Python', description: 'Step by step', url: 'https://dev.to/a/api', cover_image: 'https://media.dev.to/c.png', tag_list: ['python', 'webdev'], published_at: '2026-11-18T08:00:00Z', positive_reactions_count: 50 }]), { status: 200 });
       if (u.includes('topstories')) return new Response(JSON.stringify([101]), { status: 200 });
       if (u.includes('/item/101')) return new Response(JSON.stringify({ id: 101, type: 'story', title: 'New open source database', url: 'https://example.com/db', score: 320, descendants: 80, time: 1795000000 }), { status: 200 });
@@ -243,6 +247,16 @@ describe('Parche API', () => {
       const j = r.json();
       const ids = j.items.map((i: any) => i.sourceId);
       assert.ok(ids.includes('xataka') && ids.includes('devto') && ids.includes('hn'));
+      assert.equal(j.items[0].sourceId === 'lasalleorg' || j.items[0].sourceId.startsWith('yt-'), true, 'la red La Salle va primero');
+      const red = j.items.find((i: any) => i.sourceId === 'lasalleorg');
+      assert.equal(red.title, 'Jóvenes lasallistas de 12 países se reúnen en Roma');
+      assert.equal(red.image, 'https://www.lasalle.org/img.jpg');
+      const video = j.items.find((i: any) => i.kind === 'video');
+      assert.equal(video.url, 'https://www.youtube.com/watch?v=abc123XYZ_-');
+      assert.equal(video.source, 'La Salle Prueba TV');
+      assert.ok(!j.sources.some((s: any) => s.id === 'unisalle' || s.id === 'salleurl'), 'no acredita universidades que no respondieron');
+      const tech = (await call(token, 'GET', '/api/news?group=tech')).json();
+      assert.ok(tech.items.length && tech.items.every((i: any) => ['es', 'dev', 'trend'].includes(i.group)));
       const ia = j.items.find((i: any) => i.sourceId === 'xataka');
       assert.equal(ia.title, 'La inteligencia artificial llega a las aulas - y cambia todo');
       assert.equal(ia.summary, 'Un modelo nuevo & gratuito para estudiantes.');
