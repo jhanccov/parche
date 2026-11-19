@@ -18,6 +18,7 @@ export const ROUTES: Record<string, string> = {
   '/constancia': 'Constancia de mentoría',
   '/privacidad': 'Política de privacidad',
   '/noticias': 'La Salle hoy',
+  '/noticias/reels': 'Noticias en modo vertical',
 };
 
 const go = (to: string, label = ROUTES[to]): Action => ({ label, to });
@@ -128,8 +129,8 @@ export const KB: Entry[] = [
   {
     id: 'noticias',
     keywords: ['noticias', 'la salle hoy', 'tech hoy', 'novedades', 'que hay de nuevo', 'red la salle', 'otras universidades', 'videos', 'youtube', 'redes sociales', 'redes oficiales', 'instagram', 'facebook', 'arequipa', 'ulasalle', 'colombia', 'mexico', 'tecnologia actual', 'enterarme', 'actualidad'],
-    answer: 'En "La Salle hoy" (el ícono de periódico arriba) primero va Arequipa, luego Colombia y México, y después el resto de la red La Salle. En "Redes oficiales" ves el Facebook de ULASALLE con un toque, y los enlaces a su Instagram y a las cuentas de Unisalle y La Salle México. Abajo están las noticias de los sitios oficiales y los videos de YouTube; cada publicación enlaza a la original.',
-    actions: [go('/noticias', 'La Salle hoy'), go('/perfil', 'Ajustar mis temas')],
+    answer: 'En "La Salle hoy" (el ícono de periódico arriba) primero va Arequipa, luego Colombia y México, y después el resto de la red La Salle. En "Redes oficiales" ves el Facebook de ULASALLE con un toque, y los enlaces a su Instagram y a las cuentas de Unisalle y La Salle México. Abajo están las noticias de los sitios oficiales y los videos de YouTube; cada publicación enlaza a la original. En el inicio y en "Modo vertical" las ves una por pantalla y deslizas hacia arriba, como en TikTok.',
+    actions: [go('/noticias', 'La Salle hoy'), go('/noticias/reels'), go('/perfil', 'Ajustar mis temas')],
   },
   {
     id: 'saludo',

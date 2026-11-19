@@ -17,6 +17,7 @@ import HelpDetail from './pages/HelpDetail';
 import Challenges from './pages/Challenges';
 import ChallengeDetail from './pages/ChallengeDetail';
 import Impact from './pages/Impact';
+import NewsReels from './components/NewsReels';
 import NewsPage from './pages/News';
 import Profile from './pages/Profile';
 import Certificate from './pages/Certificate';
@@ -37,6 +38,7 @@ export default function App() {
       <Route path="/privacidad" element={<Privacy />} />
       <Route path="/bienvenida" element={<Guard><Onboarding /></Guard>} />
       <Route path="/constancia" element={<Guard><Certificate /></Guard>} />
+      <Route path="/noticias/reels" element={<Guard><NewsReels full limit={40} /></Guard>} />
       <Route element={<Guard><Layout /></Guard>}>
         <Route index element={<Home />} />
         <Route path="mapa" element={<MapPage />} />

@@ -1,5 +1,6 @@
 import { MouseEvent, useEffect, useState } from 'react';
-import { ExternalLink, Globe2, MapPin, Newspaper, Play, Share2, Sparkles, Star, Youtube } from 'lucide-react';
+import { Link } from 'react-router-dom';
+import { ExternalLink, Globe2, MapPin, Smartphone, Newspaper, Play, Share2, Sparkles, Star, Youtube } from 'lucide-react';
 import { useApi } from '../lib/useApi';
 import { ago } from '../lib/format';
 import { shareLink } from '../lib/fx';
@@ -82,6 +83,7 @@ export default function NewsPage() {
           <h1>La Salle hoy</h1>
           <p className="muted">Noticias y videos de las universidades y obras La Salle del mundo.</p>
         </div>
+        <Link className="news-reels-btn" to="/noticias/reels"><Smartphone size={16} /> Modo vertical</Link>
       </header>
 
       <div className="news-tabs" role="tablist">

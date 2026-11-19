@@ -5,6 +5,7 @@ import { api } from '../lib/api';
 import { useAuth } from '../lib/auth';
 import { Avatar, Chip, Section, Stat } from '../components/ui';
 import { ProfileForm } from './Onboarding';
+import Promos from '../components/Promos';
 
 export default function Profile() {
   const { me, signOut } = useAuth();
@@ -45,6 +46,10 @@ export default function Profile() {
 
       <Section title="Puedo ayudar en"><div className="picker">{me.skills.map((s) => <Chip key={s} tone="navy">{s}</Chip>)}</div></Section>
       <Section title="Quiero aprender"><div className="picker">{me.interests.map((s) => <Chip key={s} tone="soft">{s}</Chip>)}</div></Section>
+
+      <Section title="Saca más de Parche">
+        <Promos />
+      </Section>
 
       <div className="row gap wrap">
         <Link to="/constancia" className="btn navy"><FileText size={16} /> Constancia de mentoría</Link>

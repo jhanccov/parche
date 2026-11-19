@@ -6,8 +6,7 @@ import { useApi } from '../lib/useApi';
 import { api } from '../lib/api';
 import { ago, CATEGORIES, when } from '../lib/format';
 import { Avatar, Flag, Loading } from '../components/ui';
-import { REGION_LABEL } from '../components/SocialWall';
-import { News, NewsImage } from './News';
+import NewsReels from '../components/NewsReels';
 import { burst, setThemeColor, shareLink } from '../lib/fx';
 
 const PROMPTS = ['¿Qué aprendemos hoy?', 'Tu parche te está esperando', 'Ayuda a alguien y suma puntos', 'Arma equipo para un reto real'];
@@ -21,15 +20,8 @@ type Item =
   | { kind: 'event'; key: string; d: any }
   | { kind: 'community'; key: string; d: any }
   | { kind: 'help'; key: string; d: any }
-  | { kind: 'challenge'; key: string; d: any }
-  | { kind: 'invite'; key: string; d: { title: string; text: string; cta: string; to?: string; share?: boolean; img: string } };
+  | { kind: 'challenge'; key: string; d: any };
 
-const INVITES: Item[] = [
-  { kind: 'invite', key: 'inv-crear', d: { title: 'Crea el parche de tu carrera', text: 'Un club, un semillero o un grupo de estudio. Te guiamos paso a paso hasta que esté activo.', cta: 'Crear comunidad', to: '/comunidades/nueva', img: '/img/invite-crear.jpg' } },
-  { kind: 'invite', key: 'inv-ayuda', d: { title: '¿Te trabaste en un curso?', text: 'Pide ayuda y le llega a quien domina el tema, en tu sede o en otro país.', cta: 'Pedir ayuda', to: '/mentoria/nueva', img: '/img/invite-ayuda.jpg' } },
-  { kind: 'invite', key: 'inv-juanita', d: { title: '¡Choca esos cinco!', text: 'Juanita, la mascota de La Salle Bogotá, celebra cada hora de mentoría. Ayuda a alguien hoy y gana tu insignia de Mentor.', cta: 'Quiero ayudar', to: '/mentoria', img: '/img/mascota-juanita.webp' } },
-  { kind: 'invite', key: 'inv-share', d: { title: 'Trae a tu salón', text: 'Mientras más compañeros entren, más rápido encuentras ayuda y equipo.', cta: 'Compartir Parche', share: true, img: '/img/invite-compartir.jpg' } },
-];
 
 function mix(lists: Item[][]) {
   const out: Item[] = [];
@@ -45,7 +37,6 @@ export default function Home() {
   const comms = useApi<any[]>('/communities');
   const help = useApi<any[]>('/help');
   const challenges = useApi<any[]>('/challenges');
-  const news = useApi<{ items: News[] }>('/news?group=all&limit=8');
   const [prompt, setPrompt] = useState(0);
   const [toast, setToast] = useState<string | null>(null);
 
@@ -71,17 +62,7 @@ export default function Home() {
     const co: Item[] = (comms.data ?? []).filter((c) => !c.joined).map((d) => ({ kind: 'community', key: 'c' + d.id, d }));
     const he: Item[] = (help.data ?? []).filter((h) => h.author_id !== me?.id).map((d) => ({ kind: 'help', key: 'h' + d.id, d }));
     const ch: Item[] = (challenges.data ?? []).map((d) => ({ kind: 'challenge', key: 'r' + d.id, d }));
-    const items = mix([ev, he, co, ch]);
-    // Las invitaciones aparecen entre el contenido y siempre al final, así el inicio nunca queda vacío.
-    const out: Item[] = [];
-    items.forEach((it, i) => {
-      out.push(it);
-      if (i === 2) out.push(INVITES[0]);
-      if (i === 4) out.push(INVITES[2]);
-      if (i === 8) out.push(INVITES[3]);
-    });
-    for (const inv of INVITES) if (!out.includes(inv)) out.push(inv);
-    return out;
+    return mix([ev, he, co, ch]);
   }, [events.data, comms.data, help.data, challenges.data, me?.id]);
 
   async function share(e: MouseEvent, title: string, path = '/') {
@@ -172,31 +153,9 @@ export default function Home() {
         </div>
       </div>
 
-      {!!news.data && (
-        <section className="tech-strip" aria-label="La Salle hoy">
-          <div className="tech-strip-head">
-            <h2><Newspaper size={18} /> La Salle hoy</h2>
-            <Link to="/noticias">Ver todo <ChevronRight size={16} /></Link>
-          </div>
-          <div className="tech-scroll">
-            <Link to="/noticias" className="tech-card social">
-              <span className="tech-img tech-ph social-ph" aria-hidden><MapPin size={26} /></span>
-              <span className="tech-src">Arequipa · Redes oficiales</span>
-              <strong>Lo último de ULASALLE en Facebook e Instagram</strong>
-            </Link>
-            {news.data.items.map((n) => (
-              <a key={n.id} className="tech-card" href={n.url} target="_blank" rel="noopener noreferrer">
-                {n.image ? <NewsImage src={n.image} alt="" className="tech-img" /> : <span className="tech-img tech-ph" aria-hidden><Newspaper size={26} /></span>}
-                <span className="tech-src">{n.kind === 'video' ? 'Video · ' : ''}{n.region && n.region !== 'mundo' ? `${REGION_LABEL[n.region]} · ` : ''}{n.source}{n.forYou ? ' · Para ti' : ''}</span>
-                <strong>{n.title}</strong>
-              </a>
-            ))}
-            <Link to="/noticias" className="tech-card more"><Newspaper size={22} /><strong>Más de la red La Salle</strong></Link>
-          </div>
-        </section>
-      )}
+      <NewsReels />
 
-      <h2 className="feed-title">Para ti</h2>
+      {(feed.length > 0 || (!events.data && !comms.data)) && <h2 className="feed-title">Para ti</h2>}
 
       <div className="feed">
         {!events.data && !comms.data && <Loading rows={2} />}
@@ -291,22 +250,7 @@ export default function Home() {
               </article>
             );
           }
-          const d = it.d;
-          const inner = (
-            <>
-              <span className="promo-img" style={{ backgroundImage: `url(${d.img})` }} aria-hidden />
-              <span className="promo-text">
-                <strong>{d.title}</strong>
-                <small>{d.text}</small>
-                <span className="promo-cta">{d.cta} <ChevronRight size={16} /></span>
-              </span>
-            </>
-          );
-          return d.share ? (
-            <button key={it.key} className="promo" onClick={(e) => share(e, 'Únete a mi parche')}>{inner}</button>
-          ) : (
-            <Link key={it.key} to={d.to!} className="promo">{inner}</Link>
-          );
+          return null;
         })}
       </div>
 
