@@ -128,7 +128,7 @@ export const KB: Entry[] = [
   {
     id: 'noticias',
     keywords: ['noticias', 'la salle hoy', 'tech hoy', 'novedades', 'que hay de nuevo', 'red la salle', 'otras universidades', 'videos', 'youtube', 'redes sociales', 'instagram', 'tecnologia actual', 'enterarme', 'actualidad'],
-    answer: 'En "La Salle hoy" (el ícono de periódico arriba) ves noticias de la red La Salle del mundo (lasalle.org y sitios de universidades La Salle), videos de sus canales de YouTube y, en la pestaña Tecnología, notas de Xataka, ENTER.CO, DEV Community y Hacker News. Cada publicación enlaza a la original. Instagram y otras redes necesitan autorización de cada universidad, por eso aún no se muestran.',
+    answer: 'En "La Salle hoy" (el ícono de periódico arriba) ves solo contenido oficial de la red La Salle: noticias de lasalle.org y de universidades La Salle de varios países, y videos de sus canales de YouTube. Cada publicación enlaza a la original. Instagram y otras redes necesitan autorización de cada universidad, por eso aún no se muestran.',
     actions: [go('/noticias', 'La Salle hoy'), go('/perfil', 'Ajustar mis temas')],
   },
   {

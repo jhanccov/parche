@@ -1,5 +1,5 @@
 import { MouseEvent, useEffect, useState } from 'react';
-import { ExternalLink, Cpu, Globe2, Newspaper, Play, Share2, Sparkles, Youtube } from 'lucide-react';
+import { ExternalLink, Globe2, Newspaper, Play, Share2, Sparkles, Star, Youtube } from 'lucide-react';
 import { useApi } from '../lib/useApi';
 import { ago } from '../lib/format';
 import { shareLink } from '../lib/fx';
@@ -7,15 +7,14 @@ import { Empty, Loading } from '../components/ui';
 
 export type News = {
   id: string; title: string; summary: string; url: string; image: string | null; source: string; sourceId: string;
-  group: 'lasalle' | 'video' | 'es' | 'dev' | 'trend'; kind?: 'video'; lang: 'es' | 'en'; publishedAt: string; topics: string[]; forYou: boolean;
+  group: 'lasalle' | 'video'; kind?: 'video'; featured?: boolean; lang: 'es' | 'en' | 'pt'; publishedAt: string; topics: string[]; forYou: boolean;
 };
-type Resp = { items: News[]; topics: { id: string; label: string; mine: boolean }[]; sources: { id: string; name: string; site: string; ok: boolean; count: number }[]; updatedAt: number | null; hasVideos?: boolean };
+type Resp = { items: News[]; topics: { id: string; label: string; mine: boolean }[]; sources: { id: string; name: string; site: string; ok: boolean; count: number }[]; updatedAt: number | null; hasVideos?: boolean; featured?: boolean };
 
 const TABS = [
   { id: 'all', label: 'Para ti', icon: Sparkles },
   { id: 'lasalle', label: 'Red La Salle', icon: Globe2 },
   { id: 'video', label: 'Videos', icon: Youtube },
-  { id: 'tech', label: 'Tecnología', icon: Cpu },
 ] as const;
 
 // Imagen externa del medio: si no carga, la tarjeta queda sin foto.
@@ -36,8 +35,8 @@ export function NewsCard({ n, onShare }: { n: News; onShare?: (e: MouseEvent, n:
       ) : <NewsImage src={n.image} alt="" className="news-img" />}
       <div className="news-body">
         <p className="news-meta">
-          <strong>{n.source}</strong> · {ago(n.publishedAt)}
-          {n.lang === 'en' && <span className="news-lang">EN</span>}
+          <strong>{n.source}</strong> · {n.featured ? <span className="news-featured"><Star size={11} fill="currentColor" /> Destacado</span> : ago(n.publishedAt)}
+          {n.lang !== 'es' && <span className="news-lang">{n.lang.toUpperCase()}</span>}
           {n.forYou && <span className="news-foryou"><Sparkles size={12} /> Para ti</span>}
         </p>
         <h3><a href={n.url} target="_blank" rel="noopener noreferrer">{n.title}</a></h3>
@@ -70,7 +69,7 @@ export default function NewsPage() {
         <span className="post-ico gold"><Newspaper size={20} /></span>
         <div>
           <h1>La Salle hoy</h1>
-          <p className="muted">Lo que pasa en la red La Salle del mundo, sus videos y lo nuevo en tecnología.</p>
+          <p className="muted">Noticias y videos de las universidades y obras La Salle del mundo.</p>
         </div>
       </header>
 
@@ -95,8 +94,8 @@ export default function NewsPage() {
 
       {data && (
         <p className="news-credits">
-          Fuentes: {data.sources.map((s, i) => <span key={s.id}>{i ? ', ' : ''}<a href={s.site} target="_blank" rel="noopener noreferrer">{s.name}</a></span>)}.
-          Parche muestra titulares y resúmenes breves y enlaza siempre a la publicación original.
+          {data.featured ? 'Destacados de la red La Salle. ' : 'Fuentes: '}{(data.featured ? [] : data.sources).map((s, i) => <span key={s.id}>{i ? ', ' : ''}<a href={s.site} target="_blank" rel="noopener noreferrer">{s.name}</a></span>)}{data.featured ? '' : '. '}
+          Solo contenido oficial de la red La Salle. Parche muestra titulares y resúmenes breves y enlaza siempre a la publicación original.
         </p>
       )}
       {toast && <div className="toast" role="status">{toast}</div>}

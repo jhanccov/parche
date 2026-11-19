@@ -25,7 +25,7 @@
 - Tablero público de impacto con datos agregados y anónimos para Bienestar Universitario.
 - Reportes de contenido y moderación.
 - PWA instalable con caché sin conexión.
-- La Salle hoy: noticias de la red La Salle del mundo (API pública de lasalle.org y RSS de universidades La Salle), videos de canales de YouTube de universidades La Salle y una pestaña de Tecnología (Xataka, ENTER.CO, DEV Community, Hacker News). Fuentes gratuitas y sin claves, caché de 45 minutos, temas y orden según lo que el estudiante quiere aprender; siempre enlaza a la publicación original. Se agregan fuentes desde Render con `NEWS_YOUTUBE_CHANNELS` y `NEWS_EXTRA_FEEDS`.
+- La Salle hoy: solo contenido oficial de la red La Salle del mundo: noticias de lasalle.org y de universidades La Salle (Filadelfia, Manila, Bogotá, Barcelona) por su API de WordPress o RSS, y videos de sus canales de YouTube. Si ninguna fuente responde, muestra destacados de la red con enlaces reales. Estado de las fuentes en `/api/news/status`. Fuentes gratuitas y sin claves, caché de 45 minutos, temas y orden según lo que el estudiante quiere aprender; siempre enlaza a la publicación original. Se agregan fuentes desde Render con `NEWS_YOUTUBE_CHANNELS` y `NEWS_EXTRA_FEEDS`.
 - Asistente Juanita: chat de ayuda con la mascota de La Salle Bogotá que responde dudas y lleva a la pantalla correcta. Funciona en modo guía sin claves y con IA (Claude) si se configura `ANTHROPIC_API_KEY`; si la IA falla, vuelve sola al modo guía.
 - Consentimiento informado al entrar, política de privacidad pública (`/privacidad`) y opción de eliminar la cuenta, conforme a la Ley N.° 29733 (Perú) y la Ley 1581 de 2012 (Colombia).
 

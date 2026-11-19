@@ -23,8 +23,8 @@ Feria "Apps que transforman mi comunidad", Escuela Profesional de Ingeniería de
 - Monorepo con API (Node 22, TypeScript, Fastify 5, PostgreSQL 16, Zod, JWT) y web (React 18, Vite, PWA con Workbox, Leaflet).
 - Validación de entradas con Zod, límite de intentos por correo, códigos de un solo uso con vencimiento y hash, SQL parametrizado.
 - Asistente Juanita (modo guía y modo con IA de Claude, con respaldo automático si la IA falla).
-- La Salle hoy: noticias de la red La Salle mundial (lasalle.org y universidades La Salle), videos de YouTube de universidades La Salle y noticias de tecnología, con caché y respaldo si una fuente falla. Instagram y otras redes quedan como siguiente paso: requieren la autorización de cada universidad y la revisión de la app por Meta.
-- 16 pruebas de integración: acceso solo con correo La Salle, consentimiento obligatorio, código incorrecto, comunidades, mentoría con horas, retos interuniversitarios, impacto, privacidad del mapa, límite por correo, eliminación de cuenta y el asistente (modo guía, modo IA, respaldo y filtro de enlaces) y La Salle hoy (fuentes simuladas de lasalle.org, YouTube y tecnología, limpieza de texto, enlaces seguros y fuente caída).
+- La Salle hoy: solo contenido oficial de la red La Salle mundial (lasalle.org, universidades La Salle y sus canales de YouTube), con caché, varias rutas por sitio y destacados de respaldo si una fuente falla. Instagram y otras redes quedan como siguiente paso: requieren la autorización de cada universidad y la revisión de la app por Meta.
+- 16 pruebas de integración: acceso solo con correo La Salle, consentimiento obligatorio, código incorrecto, comunidades, mentoría con horas, retos interuniversitarios, impacto, privacidad del mapa, límite por correo, eliminación de cuenta y el asistente (modo guía, modo IA, respaldo y filtro de enlaces) y La Salle hoy (fuentes simuladas de lasalle.org, universidades y YouTube, limpieza de texto, enlaces seguros y fuente caída).
 - Despliegue con Docker en Render (una sola imagen, la API sirve la web).
 - Historial de commits de ambos integrantes.
 

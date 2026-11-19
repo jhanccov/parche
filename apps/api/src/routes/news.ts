@@ -4,7 +4,7 @@ import { one } from '../db.js';
 import { getNews } from '../news/fetcher.js';
 
 const query = z.object({
-  group: z.enum(['lasalle', 'video', 'tech', 'es', 'dev', 'trend', 'all']).optional().default('all'),
+  group: z.enum(['lasalle', 'video', 'all']).optional().default('all'),
   topic: z.string().max(30).optional(),
   limit: z.coerce.number().int().min(1).max(60).optional().default(30),
 });
@@ -19,4 +19,5 @@ export default async function newsRoutes(app: FastifyInstance) {
     const interests = u?.interests?.length ? u.interests : u?.skills ?? [];
     return getNews({ ...q, interests });
   });
+
 }

@@ -1,5 +1,6 @@
 import { XMLParser } from 'fast-xml-parser';
-import { SKILL_TOPICS, SOURCES, Source, TECH_GROUPS, TOPICS, Group } from './sources.js';
+import { SKILL_TOPICS, SOURCES, Source, TOPICS, Group } from './sources.js';
+import { FEATURED } from './featured.js';
 
 export type NewsItem = {
   id: string;
@@ -11,13 +12,14 @@ export type NewsItem = {
   sourceId: string;
   group: Group;
   kind?: 'video';
-  lang: 'es' | 'en';
+  featured?: boolean;
+  lang: 'es' | 'en' | 'pt';
   publishedAt: string;
   topics: string[];
   score?: number;
 };
 
-const UA = 'ParcheBot/1.0 (+https://github.com/jhanccov/parche; app academica La Salle)';
+const UA = 'Mozilla/5.0 (compatible; ParcheBot/1.0; +https://github.com/jhanccov/parche) app academica de la red La Salle';
 const TTL_MS = 45 * 60 * 1000;
 const parser = new XMLParser({ ignoreAttributes: false, attributeNamePrefix: '@', textNodeName: '#text', cdataPropName: false as any });
 
@@ -100,28 +102,36 @@ export function parseFeed(xml: string, src: Pick<Source, 'id' | 'name' | 'group'
   });
 }
 
-async function fetchRss(src: Extract<Source, { kind: 'rss' }>) {
+async function fetchRss(src: Extract<Source, { kind: 'rss' }>): Promise<NewsItem[]> {
   return parseFeed(String(await get(src.url, 'text')), src);
 }
 
 async function fetchWp(src: Extract<Source, { kind: 'wp' }>): Promise<NewsItem[]> {
-  try {
-    const posts = (await get(`${src.base}/wp-json/wp/v2/posts?per_page=15&_embed=wp:featuredmedia`, 'json')) as any[];
-    if (!Array.isArray(posts) || !posts.length) throw new Error('sin entradas');
-    return posts.flatMap((p) => {
-      const url = safeUrl(p.link);
-      const title = cleanText(p.title?.rendered, 160);
-      if (!url || !title) return [];
-      const media = p._embedded?.['wp:featuredmedia']?.[0];
-      const image = safeUrl(media?.media_details?.sizes?.medium_large?.source_url ?? media?.media_details?.sizes?.large?.source_url ?? media?.source_url);
-      const summary = cleanText(p.excerpt?.rendered, 220);
-      return [{ id: `${src.id}:${p.id}`, title, summary, url, image, source: src.name, sourceId: src.id, group: src.group, lang: src.lang,
-        publishedAt: new Date(p.date_gmt ? `${p.date_gmt}Z` : p.date ?? Date.now()).toISOString(), topics: classify(`${title} ${summary}`) }];
-    });
-  } catch {
-    // Si la API de WordPress no responde, se intenta con su RSS.
-    return parseFeed(String(await get(`${src.base}/feed/`, 'text')), src);
+  const errors: string[] = [];
+  // Prueba la API de WordPress y luego el RSS, en cada dirección del sitio.
+  for (const base of src.bases) {
+    try {
+      const posts = (await get(`${base}/wp-json/wp/v2/posts?per_page=15&_embed=1`, 'json')) as any[];
+      if (!Array.isArray(posts) || !posts.length) throw new Error('sin entradas');
+      const items = posts.flatMap((p) => {
+        const url = safeUrl(p.link);
+        const title = cleanText(p.title?.rendered, 160);
+        if (!url || !title) return [];
+        const media = p._embedded?.['wp:featuredmedia']?.[0];
+        const sizes = media?.media_details?.sizes ?? {};
+        const image = safeUrl(sizes.medium_large?.source_url ?? sizes.large?.source_url ?? media?.source_url);
+        const summary = cleanText(p.excerpt?.rendered, 220);
+        return [{ id: `${src.id}:${p.id}`, title, summary, url, image, source: src.name, sourceId: src.id, group: src.group, lang: src.lang,
+          publishedAt: new Date(p.date_gmt ? `${p.date_gmt}Z` : p.date ?? Date.now()).toISOString(), topics: classify(`${title} ${summary}`) }];
+      });
+      if (items.length) return items;
+    } catch (e: any) { errors.push(String(e?.message ?? e)); }
+    try {
+      const items = parseFeed(String(await get(`${base}/feed/`, 'text')), src);
+      if (items.length) return items;
+    } catch (e: any) { errors.push(String(e?.message ?? e)); }
   }
+  throw new Error(errors.join(' | ').slice(0, 200) || 'sin noticias');
 }
 
 async function fetchYoutube(src: Extract<Source, { kind: 'youtube' }>): Promise<NewsItem[]> {
@@ -139,48 +149,6 @@ async function fetchYoutube(src: Extract<Source, { kind: 'youtube' }>): Promise<
   });
 }
 
-async function fetchDevto(src: Extract<Source, { kind: 'devto' }>) {
-  const lists = await Promise.allSettled(src.tags.map((tag) => get(`https://dev.to/api/articles?per_page=12&top=7${tag ? `&tag=${encodeURIComponent(tag)}` : ''}`, 'json')));
-  const seen = new Set<string>();
-  const out: NewsItem[] = [];
-  for (const l of lists) {
-    if (l.status !== 'fulfilled' || !Array.isArray(l.value)) continue;
-    for (const a of l.value as any[]) {
-      const url = safeUrl(a.url);
-      if (!url || seen.has(url)) continue;
-      seen.add(url);
-      const title = cleanText(a.title, 160);
-      const summary = cleanText(a.description, 220);
-      const tags: string[] = Array.isArray(a.tag_list) ? a.tag_list : String(a.tag_list ?? '').split(',');
-      out.push({
-        id: `devto:${a.id}`, title, summary, url, image: safeUrl(a.cover_image ?? a.social_image), source: src.name, sourceId: src.id,
-        group: src.group, lang: tags.includes('spanish') || tags.includes('espanol') ? 'es' : 'en', publishedAt: new Date(a.published_at ?? Date.now()).toISOString(),
-        topics: classify(`${title} ${summary} ${tags.join(' ')}`), score: Number(a.positive_reactions_count ?? 0),
-      });
-    }
-  }
-  return out;
-}
-
-async function fetchHn(src: Extract<Source, { kind: 'hn' }>) {
-  const ids = ((await get('https://hacker-news.firebaseio.com/v0/topstories.json', 'json')) as number[]).slice(0, 25);
-  const items = await Promise.allSettled(ids.map((id) => get(`https://hacker-news.firebaseio.com/v0/item/${id}.json`, 'json')));
-  return items.flatMap((r) => {
-    if (r.status !== 'fulfilled') return [];
-    const s: any = r.value;
-    const url = safeUrl(s?.url) ?? safeUrl(`https://news.ycombinator.com/item?id=${s?.id}`);
-    if (!s || s.type !== 'story' || !url) return [];
-    const title = cleanText(s.title, 160);
-    let host = '';
-    try { host = new URL(url).hostname.replace(/^www\./, ''); } catch { /* sin host */ }
-    return [{
-      id: `hn:${s.id}`, title, summary: `${s.score ?? 0} puntos y ${s.descendants ?? 0} comentarios en Hacker News${host ? ` · ${host}` : ''}`,
-      url, image: null, source: src.name, sourceId: src.id, group: src.group, lang: 'en' as const,
-      publishedAt: new Date((s.time ?? Date.now() / 1000) * 1000).toISOString(), topics: classify(title), score: Number(s.score ?? 0),
-    }];
-  });
-}
-
 type Entry = { items: NewsItem[]; fetchedAt: number; ok: boolean; error?: string };
 const cache = new Map<string, Entry>();
 let refreshing: Promise<void> | null = null;
@@ -192,7 +160,7 @@ export async function refreshAll(force = false) {
       const prev = cache.get(src.id);
       if (!force && prev && Date.now() - prev.fetchedAt < TTL_MS) return;
       try {
-        const items = src.kind === 'rss' ? await fetchRss(src) : src.kind === 'wp' ? await fetchWp(src) : src.kind === 'youtube' ? await fetchYoutube(src) : src.kind === 'devto' ? await fetchDevto(src) : await fetchHn(src);
+        const items = src.kind === 'rss' ? await fetchRss(src) : src.kind === 'wp' ? await fetchWp(src) : await fetchYoutube(src);
         if (!items.length) throw new Error('sin noticias');
         cache.set(src.id, { items, fetchedAt: Date.now(), ok: true });
       } catch (e: any) {
@@ -206,7 +174,14 @@ export async function refreshAll(force = false) {
 
 export function clearNewsCache() { cache.clear(); }
 
-export async function getNews(opts: { group?: Group | 'all' | 'tech'; topic?: string; interests?: string[]; limit?: number }) {
+export function newsStatus() {
+  return SOURCES.map((s) => {
+    const e = cache.get(s.id);
+    return { id: s.id, name: s.name, ok: e?.ok ?? false, count: e?.items.length ?? 0, checkedAt: e ? new Date(e.fetchedAt).toISOString() : null, error: e?.error ?? null };
+  });
+}
+
+export async function getNews(opts: { group?: Group | 'all'; topic?: string; interests?: string[]; limit?: number }) {
   const stale = SOURCES.some((s) => { const e = cache.get(s.id); return !e || Date.now() - e.fetchedAt > TTL_MS; });
   const empty = SOURCES.every((s) => !cache.get(s.id)?.items.length);
   if (empty) await refreshAll();
@@ -214,8 +189,10 @@ export async function getNews(opts: { group?: Group | 'all' | 'tech'; topic?: st
 
   const mine = topicsForInterests(opts.interests);
   let items = [...cache.values()].flatMap((e) => e.items);
-  if (opts.group === 'tech') items = items.filter((i) => TECH_GROUPS.includes(i.group));
-  else if (opts.group && opts.group !== 'all') items = items.filter((i) => i.group === opts.group);
+  // Si ninguna fuente respondió, se muestran destacados fijos de la red La Salle con enlaces reales.
+  const usingFeatured = !items.some((i) => i.group === 'lasalle');
+  if (usingFeatured) items = [...items, ...FEATURED.map((f) => ({ ...f, topics: classify(`${f.title} ${f.summary}`) }))];
+  if (opts.group && opts.group !== 'all') items = items.filter((i) => i.group === opts.group);
   if (opts.topic) items = items.filter((i) => i.topics.includes(opts.topic!));
   const ranked = items.map((i) => {
     const forYou = i.topics.some((t) => mine.includes(t));
@@ -223,9 +200,7 @@ export async function getNews(opts: { group?: Group | 'all' | 'tech'; topic?: st
     // Prioridad: lo que le interesa al estudiante, luego lo que está en español y con foto, y lo reciente.
     // La popularidad (puntos o reacciones) solo suma un poco para no tapar a los medios en español.
     const popular = Math.min(1.5, Math.log10(1 + (i.score ?? 0)) / 2);
-    // La red La Salle y sus videos van primero: son la identidad de Parche.
-    const lasalle = i.group === 'lasalle' || i.group === 'video' ? 5 : 0;
-    const rank = lasalle + (forYou ? 4 : 0) + (i.lang === 'es' ? 3 : 0) + (i.image ? 1 : 0) + popular - ageH / 24;
+    const rank = (forYou ? 4 : 0) + (i.lang === 'es' ? 3 : 0) + (i.image ? 1 : 0) + popular - ageH / 24;
     return { ...i, forYou, rank };
   });
   ranked.sort((a, b) => b.rank - a.rank);
@@ -243,6 +218,7 @@ export async function getNews(opts: { group?: Group | 'all' | 'tech'; topic?: st
     // Solo se acreditan las fuentes que de verdad aportan noticias.
     sources: SOURCES.filter((s) => (cache.get(s.id)?.items.length ?? 0) > 0 || !s.optional).map((s) => ({ id: s.id, name: s.name, site: s.site, group: s.group, ok: cache.get(s.id)?.ok ?? false, count: cache.get(s.id)?.items.length ?? 0 })),
     hasVideos: SOURCES.some((s) => s.kind === 'youtube'),
+    featured: usingFeatured,
     updatedAt: Math.max(0, ...[...cache.values()].map((e) => e.fetchedAt)) || null,
   };
 }

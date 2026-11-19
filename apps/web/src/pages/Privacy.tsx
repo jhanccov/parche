@@ -39,8 +39,8 @@ export default function Privacy() {
 
       <h2>La Salle hoy</h2>
       <p>
-        Las noticias vienen de lasalle.org, de sitios web y canales de YouTube de universidades La Salle, y en la pestaña
-        Tecnología de Xataka, ENTER.CO, DEV Community y Hacker News. Nuestro servidor las descarga
+        Las noticias vienen solo de sitios oficiales de la red La Salle (lasalle.org y universidades La Salle) y de sus
+        canales de YouTube. Nuestro servidor las descarga
         sin enviar ningún dato tuyo; para ordenarlas solo usamos, dentro de Parche, los temas que marcaste en tu perfil.
         Las imágenes se cargan desde el sitio de cada fuente y, al abrir una publicación o un video, sales a su página.
       </p>

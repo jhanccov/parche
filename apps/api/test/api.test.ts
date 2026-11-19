@@ -12,7 +12,7 @@ const { resetAndSeed } = await import('../src/seed.js');
 const { pool } = await import('../src/db.js');
 const { parseActions } = await import('../src/routes/assistant.js');
 const { config } = await import('../src/config.js');
-const { clearNewsCache, refreshAll } = await import('../src/news/fetcher.js');
+const { clearNewsCache } = await import('../src/news/fetcher.js');
 
 let app: Awaited<ReturnType<typeof buildApp>>;
 
@@ -217,59 +217,45 @@ describe('Parche API', () => {
     }
   });
 
-  test('Tech hoy junta Xataka, DEV y Hacker News, limpia el texto y sobrevive a una fuente caída', async () => {
+  test('La Salle hoy solo usa la red La Salle, prueba varias rutas y nunca queda vacía', async () => {
     const { token } = await login('noticias.prueba@ulasalle.edu.pe');
     const realFetch = globalThis.fetch;
-    const rss = `<?xml version="1.0"?><rss version="2.0" xmlns:media="http://search.yahoo.com/mrss/"><channel><title>Xataka</title>
-      <item><title>La inteligencia artificial llega a las aulas — y cambia todo</title><link>https://www.xataka.com/nota-ia</link>
-        <description><![CDATA[<p>Un <b>modelo</b> nuevo &amp; gratuito para estudiantes.</p><img src="https://i.blogs.es/foto.jpg">]]></description>
-        <pubDate>Wed, 18 Nov 2026 10:00:00 GMT</pubDate></item>
-      <item><title>Enlace peligroso</title><link>javascript:alert(1)</link><description>x</description></item>
-    </channel></rss>`;
-    let enterFalla = true;
+    const pedidas: string[] = [];
     globalThis.fetch = (async (url: any) => {
       const u = String(url);
-      if (u.includes('xataka')) return new Response(rss, { status: 200 });
-      if (u.includes('enter.co')) return enterFalla ? new Response('error', { status: 500 }) : new Response(rss.replace(/xataka/g, 'enter'), { status: 200 });
-      if (u.includes('lasalle.org/wp-json')) return new Response(JSON.stringify([{ id: 7, link: 'https://www.lasalle.org/nota-red', date_gmt: '2026-11-18T09:00:00', title: { rendered: 'Jóvenes lasallistas de 12 países se reúnen en Roma' }, excerpt: { rendered: '<p>Encuentro internacional de la red.</p>' }, _embedded: { 'wp:featuredmedia': [{ source_url: 'https://www.lasalle.org/img.jpg' }] } }]), { status: 200 });
+      pedidas.push(u);
+      // lasalle.org: la ruta principal falla y responde la versión /en
+      if (u.startsWith('https://www.lasalle.org/wp-json') || u === 'https://www.lasalle.org/feed/') return new Response('bloqueado', { status: 403 });
+      if (u.startsWith('https://www.lasalle.org/en/wp-json')) return new Response(JSON.stringify([{ id: 7, link: 'https://www.lasalle.org/en/nota-red', date_gmt: '2026-11-18T09:00:00', title: { rendered: 'Young Lasallians from 12 countries meet in Rome &#8211; a new chapter' }, excerpt: { rendered: '<p>International gathering of the network.</p>' }, _embedded: { 'wp:featuredmedia': [{ source_url: 'https://www.lasalle.org/img.jpg' }] } }]), { status: 200 });
+      if (u.startsWith('https://www.lasalle.edu/wp-json')) return new Response(JSON.stringify([{ id: 9, link: 'javascript:alert(1)', title: { rendered: 'Enlace peligroso' } }, { id: 10, link: 'https://www.lasalle.edu/news/x', date_gmt: '2026-11-17T09:00:00', title: { rendered: 'La Salle University welcomes new students' }, excerpt: { rendered: 'Campus news' } }]), { status: 200 });
       if (u.includes('youtube.com/feeds')) return new Response(`<?xml version="1.0"?><feed xmlns:yt="http://www.youtube.com/xml/schemas/2015" xmlns:media="http://search.yahoo.com/mrss/" xmlns="http://www.w3.org/2005/Atom"><entry><yt:videoId>abc123XYZ_-</yt:videoId><title>Bienvenida a cachimbos 2027</title><link rel="alternate" href="https://www.youtube.com/watch?v=abc123XYZ_-"/><published>2026-11-17T15:00:00+00:00</published><media:group><media:thumbnail url="https://i.ytimg.com/vi/abc123XYZ_-/hqdefault.jpg"/><media:description>Video oficial</media:description></media:group></entry></feed>`, { status: 200 });
-      if (u.includes('lasalle.edu.co') || u.includes('salleurl.edu')) return new Response('no', { status: 404 });
-      if (u.includes('dev.to')) return new Response(JSON.stringify([{ id: 1, title: 'Build a REST API with Python', description: 'Step by step', url: 'https://dev.to/a/api', cover_image: 'https://media.dev.to/c.png', tag_list: ['python', 'webdev'], published_at: '2026-11-18T08:00:00Z', positive_reactions_count: 50 }]), { status: 200 });
-      if (u.includes('topstories')) return new Response(JSON.stringify([101]), { status: 200 });
-      if (u.includes('/item/101')) return new Response(JSON.stringify({ id: 101, type: 'story', title: 'New open source database', url: 'https://example.com/db', score: 320, descendants: 80, time: 1795000000 }), { status: 200 });
       return new Response('no', { status: 404 });
     }) as any;
     try {
       clearNewsCache();
-      await call(token, 'PUT', '/api/me', { name: 'Noticias Prueba', campus_id: (await pool.query("select c.id from campuses c join universities u on u.id = c.university_id where u.short_name = 'ULASALLE' limit 1")).rows[0].id, career: 'Ingeniería de Software', semester: 3, interests: ['Inteligencia artificial'], skills: [] });
       const r = await call(token, 'GET', '/api/news?group=all');
       assert.equal(r.statusCode, 200, r.body);
       const j = r.json();
-      const ids = j.items.map((i: any) => i.sourceId);
-      assert.ok(ids.includes('xataka') && ids.includes('devto') && ids.includes('hn'));
-      assert.equal(j.items[0].sourceId === 'lasalleorg' || j.items[0].sourceId.startsWith('yt-'), true, 'la red La Salle va primero');
+      assert.ok(pedidas.every((u) => /lasalle\.org|lasalle\.edu|dlsu\.edu\.ph|lasalle\.edu\.co|salleurl\.edu|youtube\.com/.test(u)), 'solo consulta sitios de la red La Salle');
       const red = j.items.find((i: any) => i.sourceId === 'lasalleorg');
-      assert.equal(red.title, 'Jóvenes lasallistas de 12 países se reúnen en Roma');
+      assert.equal(red.title, 'Young Lasallians from 12 countries meet in Rome - a new chapter');
       assert.equal(red.image, 'https://www.lasalle.org/img.jpg');
+      assert.ok(j.items.some((i: any) => i.sourceId === 'lasalle-philadelphia'));
+      assert.ok(!j.items.some((i: any) => i.url.startsWith('javascript:')), 'descarta enlaces peligrosos');
       const video = j.items.find((i: any) => i.kind === 'video');
       assert.equal(video.url, 'https://www.youtube.com/watch?v=abc123XYZ_-');
       assert.equal(video.source, 'La Salle Prueba TV');
-      assert.ok(!j.sources.some((s: any) => s.id === 'unisalle' || s.id === 'salleurl'), 'no acredita universidades que no respondieron');
-      const tech = (await call(token, 'GET', '/api/news?group=tech')).json();
-      assert.ok(tech.items.length && tech.items.every((i: any) => ['es', 'dev', 'trend'].includes(i.group)));
-      const ia = j.items.find((i: any) => i.sourceId === 'xataka');
-      assert.equal(ia.title, 'La inteligencia artificial llega a las aulas - y cambia todo');
-      assert.equal(ia.summary, 'Un modelo nuevo & gratuito para estudiantes.');
-      assert.equal(ia.image, 'https://i.blogs.es/foto.jpg');
-      assert.ok(ia.topics.includes('ia') && ia.forYou, 'se marca para ti según lo que quiere aprender');
-      assert.ok(!j.items.some((i: any) => i.url.startsWith('javascript:')), 'descarta enlaces peligrosos');
-      assert.equal(j.sources.find((s: any) => s.id === 'enter').ok, false);
+      assert.equal(j.featured, false);
+      assert.ok(!j.sources.some((s: any) => s.id === 'dlsu-manila' || s.id === 'unisalle'), 'no acredita sitios que no respondieron');
+      const st = await call(token, 'GET', '/api/news/status');
+      assert.equal(st.json().find((s: any) => s.id === 'dlsu-manila').ok, false);
 
-      // Si todas las fuentes fallan, se mantienen las últimas noticias.
+      // Si ninguna fuente responde desde el inicio, aparecen los destacados de la red La Salle.
+      clearNewsCache();
       globalThis.fetch = (async () => new Response('caído', { status: 503 })) as any;
-      await refreshAll(true);
-      const r2 = await call(token, 'GET', '/api/news?group=es');
-      assert.ok(r2.json().items.some((i: any) => i.sourceId === 'xataka'));
+      const d = (await call(token, 'GET', '/api/news?group=lasalle')).json();
+      assert.equal(d.featured, true);
+      assert.ok(d.items.length >= 5 && d.items.every((i: any) => i.featured && /^https:\/\//.test(i.url)));
     } finally {
       globalThis.fetch = realFetch;
       clearNewsCache();

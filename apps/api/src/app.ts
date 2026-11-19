@@ -21,6 +21,7 @@ import impactRoutes from './routes/impact.js';
 import reportRoutes from './routes/reports.js';
 import assistantRoutes from './routes/assistant.js';
 import newsRoutes from './routes/news.js';
+import { newsStatus } from './news/fetcher.js';
 
 declare module '@fastify/jwt' {
   interface FastifyJWT {
@@ -86,6 +87,8 @@ export async function buildApp() {
   await app.register(impactRoutes, { prefix: '/api/impact' });
   await app.register(reportRoutes, { prefix: '/api/reports' });
   await app.register(assistantRoutes, { prefix: '/api/assistant' });
+  // Estado público de las fuentes de La Salle hoy (sin datos personales), para revisar en producción.
+  app.get('/api/news/status', async () => newsStatus());
   await app.register(newsRoutes, { prefix: '/api/news' });
 
   // En producción la misma API sirve la app web compilada (un solo servicio).
