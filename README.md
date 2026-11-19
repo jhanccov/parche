@@ -25,6 +25,7 @@
 - Tablero público de impacto con datos agregados y anónimos para Bienestar Universitario.
 - Reportes de contenido y moderación.
 - PWA instalable con caché sin conexión.
+- Tech hoy: noticias de tecnología gratuitas y sin claves (RSS de Xataka y ENTER.CO, API pública de DEV Community y API de Hacker News), con caché de 45 minutos, temas, orden según lo que el estudiante quiere aprender y enlace siempre a la nota original.
 - Asistente Juanita: chat de ayuda con la mascota de La Salle Bogotá que responde dudas y lleva a la pantalla correcta. Funciona en modo guía sin claves y con IA (Claude) si se configura `ANTHROPIC_API_KEY`; si la IA falla, vuelve sola al modo guía.
 - Consentimiento informado al entrar, política de privacidad pública (`/privacidad`) y opción de eliminar la cuenta, conforme a la Ley N.° 29733 (Perú) y la Ley 1581 de 2012 (Colombia).
 
@@ -69,7 +70,7 @@ pnpm dev                         # API en :4000 y web en :5173
 
 ```bash
 createdb parche_test             # base de datos de pruebas
-pnpm test                        # 15 pruebas de integración de la API
+pnpm test                        # 16 pruebas de integración de la API
 ```
 
 ### Publicar en internet (Render)
@@ -93,7 +94,7 @@ Parche también se presenta a la Feria Concurso "Apps que transforman mi comunid
 | MVP demostrable en vivo | https://parche-bokw.onrender.com (modo demostración con usuarios de ejemplo). |
 | Repositorio con aportes de todo el equipo | Este repositorio, con commits de ambos integrantes. |
 | Ley N.° 29733 y consentimiento | Casilla de consentimiento obligatoria, política en `/privacidad` y eliminación de cuenta. Ver [`docs/privacidad-y-seguridad.md`](docs/privacidad-y-seguridad.md). |
-| Pruebas | 15 pruebas de integración de la API (`pnpm test`). |
+| Pruebas | 16 pruebas de integración de la API (`pnpm test`). |
 
 Detalle por criterio de la rúbrica y guion de la demostración en [`docs/feria-2026.md`](docs/feria-2026.md).
 

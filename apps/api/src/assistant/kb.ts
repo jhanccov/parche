@@ -17,6 +17,7 @@ export const ROUTES: Record<string, string> = {
   '/perfil': 'Mi perfil',
   '/constancia': 'Constancia de mentoría',
   '/privacidad': 'Política de privacidad',
+  '/noticias': 'Tech hoy',
 };
 
 const go = (to: string, label = ROUTES[to]): Action => ({ label, to });
@@ -123,6 +124,12 @@ export const KB: Entry[] = [
     keywords: ['reportar', 'denunciar', 'contenido inapropiado', 'acoso', 'moderacion'],
     answer: 'En solicitudes, comunidades y mensajes tienes la opción "Reportar". El equipo de moderación lo revisa. Parche no es una app de citas: los chats solo existen dentro de una mentoría, una comunidad o un reto.',
     actions: [],
+  },
+  {
+    id: 'noticias',
+    keywords: ['noticias', 'tech hoy', 'novedades', 'que hay de nuevo', 'tecnologia actual', 'enterarme', 'actualidad', 'tendencias'],
+    answer: 'En "Tech hoy" (el ícono de periódico arriba) tienes noticias de tecnología de Xataka y ENTER.CO en español, artículos de DEV Community para devs y lo más comentado en Hacker News. Se ordenan según lo que marcaste en "Quiero aprender" y cada una enlaza a la nota original.',
+    actions: [go('/noticias'), go('/perfil', 'Ajustar mis temas')],
   },
   {
     id: 'saludo',

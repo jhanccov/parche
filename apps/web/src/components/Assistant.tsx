@@ -19,6 +19,7 @@ function suggestionsFor(path: string): string[] {
   if (path.startsWith('/perfil') || path.startsWith('/constancia')) return ['¿Cómo gano insignias?', '¿Cómo saco mi constancia?', '¿Cómo borro mi cuenta?'];
   if (path.startsWith('/mapa')) return ['¿Qué muestra el mapa?', '¿Alguien ve mi ubicación?'];
   if (path.startsWith('/impacto')) return ['¿Qué mide el impacto?', '¿Mis datos son anónimos?'];
+  if (path.startsWith('/noticias')) return ['¿De dónde salen las noticias?', '¿Cómo elijo mis temas?'];
   return ['¿Qué es Parche?', '¿Cómo pido ayuda?', '¿Cómo creo una comunidad?', '¿Quién ve mis datos?'];
 }
 

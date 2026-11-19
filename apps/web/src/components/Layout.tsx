@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { NavLink, Link, Outlet, useLocation } from 'react-router-dom';
-import { Home, Map, Users, HandHelping, Mountain, Plus, Sparkles, Share2, LifeBuoy, Rocket, Sparkle, ChevronRight, X, ArrowRight } from 'lucide-react';
+import { Home, Map, Users, HandHelping, Mountain, Plus, Sparkles, Share2, LifeBuoy, Rocket, Sparkle, ChevronRight, X, ArrowRight, Newspaper } from 'lucide-react';
 import { useAuth } from '../lib/auth';
 import { shareLink } from '../lib/fx';
 import { Avatar } from './ui';
@@ -8,7 +8,7 @@ import Assistant from './Assistant';
 import { prefetch } from '../lib/useApi';
 
 const PREFETCH: Record<string, string[]> = {
-  '/': ['/events', '/communities', '/help', '/challenges'],
+  '/': ['/events', '/communities', '/help', '/challenges', '/news?group=all&limit=8'],
   '/comunidades': ['/communities?'],
   '/mapa': ['/map'],
   '/mentoria': ['/help?scope=para-mi'],
@@ -68,6 +68,9 @@ export default function Layout() {
           <span className="wordmark">parche<i aria-hidden><Sparkle size={16} fill="currentColor" strokeWidth={0} /></i></span>
         </Link>
         <div className="topbar-right">
+          <Link to="/noticias" className="icon-btn news-btn" aria-label="Tech hoy, noticias de tecnología" onPointerEnter={() => prefetch('/news?group=all&limit=40')}>
+            <Newspaper size={20} />
+          </Link>
           <Link to="/impacto" className="pill gold topbar-impact" aria-label="Impacto de la red">
             <Sparkles size={14} /><span>Impacto</span>
           </Link>

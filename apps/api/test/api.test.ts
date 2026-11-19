@@ -11,6 +11,7 @@ const { resetAndSeed } = await import('../src/seed.js');
 const { pool } = await import('../src/db.js');
 const { parseActions } = await import('../src/routes/assistant.js');
 const { config } = await import('../src/config.js');
+const { clearNewsCache, refreshAll } = await import('../src/news/fetcher.js');
 
 let app: Awaited<ReturnType<typeof buildApp>>;
 
@@ -212,6 +213,52 @@ describe('Parche API', () => {
     } finally {
       globalThis.fetch = realFetch;
       config.anthropicApiKey = '';
+    }
+  });
+
+  test('Tech hoy junta Xataka, DEV y Hacker News, limpia el texto y sobrevive a una fuente caída', async () => {
+    const { token } = await login('noticias.prueba@ulasalle.edu.pe');
+    const realFetch = globalThis.fetch;
+    const rss = `<?xml version="1.0"?><rss version="2.0" xmlns:media="http://search.yahoo.com/mrss/"><channel><title>Xataka</title>
+      <item><title>La inteligencia artificial llega a las aulas — y cambia todo</title><link>https://www.xataka.com/nota-ia</link>
+        <description><![CDATA[<p>Un <b>modelo</b> nuevo &amp; gratuito para estudiantes.</p><img src="https://i.blogs.es/foto.jpg">]]></description>
+        <pubDate>Wed, 18 Nov 2026 10:00:00 GMT</pubDate></item>
+      <item><title>Enlace peligroso</title><link>javascript:alert(1)</link><description>x</description></item>
+    </channel></rss>`;
+    let enterFalla = true;
+    globalThis.fetch = (async (url: any) => {
+      const u = String(url);
+      if (u.includes('xataka')) return new Response(rss, { status: 200 });
+      if (u.includes('enter.co')) return enterFalla ? new Response('error', { status: 500 }) : new Response(rss.replace(/xataka/g, 'enter'), { status: 200 });
+      if (u.includes('dev.to')) return new Response(JSON.stringify([{ id: 1, title: 'Build a REST API with Python', description: 'Step by step', url: 'https://dev.to/a/api', cover_image: 'https://media.dev.to/c.png', tag_list: ['python', 'webdev'], published_at: '2026-11-18T08:00:00Z', positive_reactions_count: 50 }]), { status: 200 });
+      if (u.includes('topstories')) return new Response(JSON.stringify([101]), { status: 200 });
+      if (u.includes('/item/101')) return new Response(JSON.stringify({ id: 101, type: 'story', title: 'New open source database', url: 'https://example.com/db', score: 320, descendants: 80, time: 1795000000 }), { status: 200 });
+      return new Response('no', { status: 404 });
+    }) as any;
+    try {
+      clearNewsCache();
+      await call(token, 'PUT', '/api/me', { name: 'Noticias Prueba', campus_id: (await pool.query("select c.id from campuses c join universities u on u.id = c.university_id where u.short_name = 'ULASALLE' limit 1")).rows[0].id, career: 'Ingeniería de Software', semester: 3, interests: ['Inteligencia artificial'], skills: [] });
+      const r = await call(token, 'GET', '/api/news?group=all');
+      assert.equal(r.statusCode, 200, r.body);
+      const j = r.json();
+      const ids = j.items.map((i: any) => i.sourceId);
+      assert.ok(ids.includes('xataka') && ids.includes('devto') && ids.includes('hn'));
+      const ia = j.items.find((i: any) => i.sourceId === 'xataka');
+      assert.equal(ia.title, 'La inteligencia artificial llega a las aulas - y cambia todo');
+      assert.equal(ia.summary, 'Un modelo nuevo & gratuito para estudiantes.');
+      assert.equal(ia.image, 'https://i.blogs.es/foto.jpg');
+      assert.ok(ia.topics.includes('ia') && ia.forYou, 'se marca para ti según lo que quiere aprender');
+      assert.ok(!j.items.some((i: any) => i.url.startsWith('javascript:')), 'descarta enlaces peligrosos');
+      assert.equal(j.sources.find((s: any) => s.id === 'enter').ok, false);
+
+      // Si todas las fuentes fallan, se mantienen las últimas noticias.
+      globalThis.fetch = (async () => new Response('caído', { status: 503 })) as any;
+      await refreshAll(true);
+      const r2 = await call(token, 'GET', '/api/news?group=es');
+      assert.ok(r2.json().items.some((i: any) => i.sourceId === 'xataka'));
+    } finally {
+      globalThis.fetch = realFetch;
+      clearNewsCache();
     }
   });
 });

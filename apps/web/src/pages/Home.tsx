@@ -1,11 +1,12 @@
 import { useEffect, useMemo, useState, MouseEvent } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { CalendarDays, HandHelping, Heart, MapPin, Mountain, Plus, Share2, Users, UserPlus, Check, Hand, MessageCircle, ChevronRight, Rocket } from 'lucide-react';
+import { CalendarDays, HandHelping, Heart, MapPin, Mountain, Plus, Share2, Users, UserPlus, Check, Hand, MessageCircle, ChevronRight, Rocket, Newspaper } from 'lucide-react';
 import { useAuth } from '../lib/auth';
 import { useApi } from '../lib/useApi';
 import { api } from '../lib/api';
 import { ago, CATEGORIES, when } from '../lib/format';
 import { Avatar, Flag, Loading } from '../components/ui';
+import { News, NewsImage } from './News';
 import { burst, setThemeColor, shareLink } from '../lib/fx';
 
 const PROMPTS = ['¿Qué aprendemos hoy?', 'Tu parche te está esperando', 'Ayuda a alguien y suma puntos', 'Arma equipo para un reto real'];
@@ -43,6 +44,7 @@ export default function Home() {
   const comms = useApi<any[]>('/communities');
   const help = useApi<any[]>('/help');
   const challenges = useApi<any[]>('/challenges');
+  const news = useApi<{ items: News[] }>('/news?group=all&limit=8');
   const [prompt, setPrompt] = useState(0);
   const [toast, setToast] = useState<string | null>(null);
 
@@ -168,6 +170,25 @@ export default function Home() {
           <Link to="/retos"><Mountain size={18} /> Reto</Link>
         </div>
       </div>
+
+      {!!news.data?.items.length && (
+        <section className="tech-strip" aria-label="Tech hoy">
+          <div className="tech-strip-head">
+            <h2><Newspaper size={18} /> Tech hoy</h2>
+            <Link to="/noticias">Ver todo <ChevronRight size={16} /></Link>
+          </div>
+          <div className="tech-scroll">
+            {news.data.items.map((n) => (
+              <a key={n.id} className="tech-card" href={n.url} target="_blank" rel="noopener noreferrer">
+                {n.image ? <NewsImage src={n.image} alt="" className="tech-img" /> : <span className="tech-img tech-ph" aria-hidden><Newspaper size={26} /></span>}
+                <span className="tech-src">{n.source}{n.forYou ? ' · Para ti' : ''}</span>
+                <strong>{n.title}</strong>
+              </a>
+            ))}
+            <Link to="/noticias" className="tech-card more"><Newspaper size={22} /><strong>Más noticias de tecnología</strong></Link>
+          </div>
+        </section>
+      )}
 
       <h2 className="feed-title">Para ti</h2>
 

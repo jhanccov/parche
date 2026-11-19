@@ -17,6 +17,7 @@ import HelpDetail from './pages/HelpDetail';
 import Challenges from './pages/Challenges';
 import ChallengeDetail from './pages/ChallengeDetail';
 import Impact from './pages/Impact';
+import NewsPage from './pages/News';
 import Profile from './pages/Profile';
 import Certificate from './pages/Certificate';
 
@@ -48,6 +49,7 @@ export default function App() {
         <Route path="retos" element={<Challenges />} />
         <Route path="retos/:id" element={<ChallengeDetail />} />
         <Route path="impacto" element={<Impact />} />
+        <Route path="noticias" element={<NewsPage />} />
         <Route path="perfil" element={<Profile />} />
       </Route>
       <Route path="*" element={<Navigate to="/" replace />} />
