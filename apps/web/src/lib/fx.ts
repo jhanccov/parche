@@ -1,15 +1,16 @@
-const COLORS = ['#F49C18', '#FCD116', '#CE1126', '#18C6B3', '#FF4D8D', '#FFFFFF', '#5AA9FF'];
+const COLORS = ['var(--gold)', 'var(--sun)', 'var(--navy2)', 'var(--white)', 'var(--navy-mist)'];
 
 export const APP_URL = typeof window !== 'undefined' ? window.location.origin : '';
 
-const THEME_DEFAULT = '#2B3682';
-const THEME_DARK = '#1E2344';
+// El theme-color del navegador necesita un valor real: se lee de la paleta en styles.css.
+const cssVar = (name: string) => getComputedStyle(document.documentElement).getPropertyValue(name).trim();
 
 /** Mantiene el theme-color del navegador alineado con el fondo real
  *  (las páginas oscuras usan night, no navy) para evitar el flash. */
 export function setThemeColor(mode: 'dark' | 'default') {
   if (typeof document === 'undefined') return;
-  const color = mode === 'dark' ? THEME_DARK : THEME_DEFAULT;
+  const color = cssVar(mode === 'dark' ? '--night' : '--navy');
+  if (!color) return;
   let meta = document.querySelector<HTMLMetaElement>('meta[name="theme-color"]');
   if (!meta) {
     meta = document.createElement('meta');

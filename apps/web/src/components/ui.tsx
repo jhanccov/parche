@@ -11,7 +11,7 @@ export function Avatar({ name, size = 40 }: { name?: string | null; size?: numbe
 
 export function Chip({ children, tone = 'plain', color }: { children: ReactNode; tone?: 'plain' | 'gold' | 'navy' | 'soft'; color?: string }) {
   return (
-    <span className={`chip chip-${tone}`} style={color ? { background: color + '1A', color, borderColor: color + '40' } : undefined}>
+    <span className={`chip chip-${tone}`} style={color ? { background: `color-mix(in srgb, ${color} 10%, var(--white))`, color, borderColor: `color-mix(in srgb, ${color} 25%, transparent)` } : undefined}>
       {children}
     </span>
   );
@@ -96,18 +96,18 @@ export function Flag({ country, size = 18 }: { country?: string | null; size?: n
   if (country === 'Colombia') {
     return (
       <svg className="flag" width={size} height={h} viewBox="0 0 3 2" role="img" aria-label="Bandera de Colombia">
-        <rect width="3" height="1" fill="#FCD116" />
-        <rect y="1" width="3" height="0.5" fill="#003893" />
-        <rect y="1.5" width="3" height="0.5" fill="#CE1126" />
+        <rect width="3" height="1" style={{ fill: 'var(--flag-co-yellow)' }} />
+        <rect y="1" width="3" height="0.5" style={{ fill: 'var(--flag-co-blue)' }} />
+        <rect y="1.5" width="3" height="0.5" style={{ fill: 'var(--flag-co-red)' }} />
       </svg>
     );
   }
   if (country === 'Perú') {
     return (
       <svg className="flag" width={size} height={h} viewBox="0 0 3 2" role="img" aria-label="Bandera del Perú">
-        <rect width="3" height="2" fill="#FFFFFF" />
-        <rect width="1" height="2" fill="#D91023" />
-        <rect x="2" width="1" height="2" fill="#D91023" />
+        <rect width="3" height="2" style={{ fill: 'var(--white)' }} />
+        <rect width="1" height="2" style={{ fill: 'var(--flag-pe-red)' }} />
+        <rect x="2" width="1" height="2" style={{ fill: 'var(--flag-pe-red)' }} />
       </svg>
     );
   }

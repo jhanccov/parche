@@ -20,19 +20,26 @@
 
 ## Colores
 
-Desde noviembre de 2026 la paleta toma la identidad de la Universidad de La Salle (Bogotá, Colombia): azul índigo `#2B3682`, azul noche `#1E2344` y dorado `#F49C18`, medidos sobre su pieza oficial con la mascota Juanita. Las banderas del Perú y de Colombia se dibujan en SVG con sus colores oficiales (Colombia: amarillo `#FCD116`, azul `#003893`, rojo `#CE1126`; Perú: rojo `#D91023` y blanco), porque los emojis de bandera no se ven en Windows.
+La paleta vive en un solo lugar: el bloque `:root` de `apps/web/src/styles.css`. Fuera de ese bloque no se escribe ningún color en hexadecimal ni rgba, ni en CSS ni en TypeScript; todo usa `var(--...)` o una mezcla con `color-mix()` de esas mismas variables. La identidad es la de la Universidad de La Salle (Bogotá, Colombia), medida sobre su pieza oficial con la mascota Juanita.
 
-| Token | Valor | Uso |
+| Variable | Valor | Uso |
 | --- | --- | --- |
-| `--navy` | `#2B3682` | Superficies principales, texto sobre claro |
-| `--navy2` | `#3D4BA8` | Variantes, iconos secundarios |
-| `--night` | `#1E2344` | Fondo oscuro (home, topbar, tabbar) |
-| `--gold` / `--sun` | `#F49C18` / `#FFB21E` | Solo sobre superficies oscuras |
-| `--gold-ink` | `#8A5F00` | Texto e iconos ámbar sobre fondos claros (AA) |
-| `--gold-soft` | `#FDEFD6` | Fondos de aviso |
-| `--green` | `#2F7D5C` | Territorio, rural |
-| `--bg` / `--card` | `#FBF7EE` / `#FFFFFF` | Fondo claro / tarjetas |
-| `--danger` | `#B5482E` | Errores |
+| `--navy` | `#2B3682` | Azul índigo La Salle: superficies, botones, texto sobre claro |
+| `--navy2` | `#3D4BA8` | Azul índigo claro: variantes e iconos |
+| `--night` | `#1E2344` | Azul noche La Salle: fondo oscuro, barras de navegación |
+| `--gold` | `#F49C18` | Dorado La Salle: acciones principales, puntos |
+| `--sun` | `#FFB21E` | Dorado claro, solo sobre fondos oscuros |
+| `--gold-ink` | `#8A5F00` | Dorado oscuro para texto sobre claro (contraste AA) |
+| `--white` / `--bg` | `#FFFFFF` / `#FBF7EE` | Tarjetas / fondo claro |
+| `--line` | `#E8E1CF` | Bordes y separadores |
+| `--ink` / `--muted` | `#1B2433` / `#5F6B7A` | Texto principal / secundario |
+| `--danger` | `#B42318` | Solo errores y eliminar cuenta |
+
+Derivados (mezclas de la paleta, no colores nuevos): `--gold-soft`, `--navy-soft`, `--navy-mist`, `--on-dark-muted`, `--danger-soft`, `--surface` y todas las transparencias, que se escriben como `color-mix(in srgb, var(--night) 55%, transparent)`.
+
+Las banderas usan sus colores oficiales (`--flag-co-yellow`, `--flag-co-blue`, `--flag-co-red`, `--flag-pe-red`) y solo dentro del componente `Flag`. Son SVG porque los emojis de bandera no se ven en Windows.
+
+Excepciones que no pueden leer variables CSS: `theme_color` del manifiesto y la etiqueta `theme-color` de `index.html` llevan el valor de `--navy` escrito; en tiempo de ejecución `setThemeColor` lo lee de la paleta. El logo y los íconos PNG se generan con `logo/render_logo.py` usando los mismos valores.
 
 ## Tipografía
 

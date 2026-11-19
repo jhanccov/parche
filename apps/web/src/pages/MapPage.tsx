@@ -1,6 +1,6 @@
 import { useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { MapContainer, Marker, Popup, TileLayer, ZoomControl } from 'react-leaflet';
+import { AttributionControl, MapContainer, Marker, Popup, TileLayer, ZoomControl } from 'react-leaflet';
 import L, { LatLngBoundsExpression } from 'leaflet';
 import { useApi } from '../lib/useApi';
 import { useAuth } from '../lib/auth';
@@ -18,7 +18,7 @@ const ICONS = {
   help: icon('mk-help', '?'),
 };
 const communityIcon = (cat: string) =>
-  L.divIcon({ className: '', html: `<div class="mk mk-community" style="background:${CATEGORIES[cat]?.color ?? '#2B3682'}"><span>👥</span></div>`, iconSize: [34, 34], iconAnchor: [17, 34], popupAnchor: [0, -30] });
+  L.divIcon({ className: '', html: `<div class="mk mk-community" style="background:${CATEGORIES[cat]?.color ?? 'var(--navy)'}"><span>👥</span></div>`, iconSize: [34, 34], iconAnchor: [17, 34], popupAnchor: [0, -30] });
 
 // Sin API key: OpenStreetMap estándar no requiere clave ni cuenta.
 // Se evita CARTO/Google/Mapbox para que el mapa funcione en local, Docker y Render sin configurar nada.
@@ -86,7 +86,9 @@ export default function MapPage() {
       {empty ? (
         <Empty title="Aún no hay puntos en el mapa" />
       ) : (
-        <MapContainer key={view} bounds={bounds} className="map" scrollWheelZoom zoomControl={false} maxZoom={19} worldCopyJump>
+        <MapContainer key={view} bounds={bounds} className="map" scrollWheelZoom zoomControl={false} attributionControl={false} maxZoom={19} worldCopyJump>
+          {/* Créditos sin la bandera que Leaflet agrega por defecto: fuera de la paleta */}
+          <AttributionControl prefix={'<a href="https://leafletjs.com">Leaflet</a>'} />
           <ZoomControl position="bottomright" />
           <TileLayer attribution={TILE_ATTR} url={TILE_URL} maxZoom={19} />
           {on.campuses && campuses.filter(validPt).map((c: any) => (
@@ -118,11 +120,11 @@ export default function MapPage() {
       )}
       <p className="map-note">
         <span className="legend" aria-label="Leyenda">
-          <i className="dot" style={{ background: '#2B3682' }} /> Sede
-          <i className="dot" style={{ background: '#2F7D5C' }} /> Rural
-          <i className="dot" style={{ background: '#F49C18' }} /> Evento
-          <i className="dot" style={{ background: '#B07A00' }} /> Reto
-          <i className="dot" style={{ background: '#6B4C9A' }} /> Ayuda
+          <i className="dot" style={{ background: 'var(--navy)' }} /> Sede
+          <i className="dot" style={{ background: 'var(--night)' }} /> Rural
+          <i className="dot" style={{ background: 'var(--gold)' }} /> Evento
+          <i className="dot" style={{ background: 'var(--gold-ink)' }} /> Reto
+          <i className="dot" style={{ background: 'var(--navy2)' }} /> Ayuda
         </span>
         <span>Ubicaciones aproximadas. Nunca la ubicación de una persona.</span>
       </p>

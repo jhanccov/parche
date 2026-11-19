@@ -12,8 +12,8 @@ const PROMPTS = ['¿Qué aprendemos hoy?', 'Tu parche te está esperando', 'Ayud
 
 // Foto sobre degradado: la imagen manda, el overlay garantiza lectura.
 // Si la foto falla, queda el navy de fondo y el texto sigue legible.
-const photo = (img?: string, overlay = 'linear-gradient(180deg, rgba(30,35,68,0) 35%, rgba(30,35,68,0.72))') =>
-  img ? { backgroundColor: '#2B3682', backgroundImage: `${overlay}, url(${img})` } as const : {};
+const photo = (img?: string, overlay = 'linear-gradient(180deg, color-mix(in srgb, var(--night) 0%, transparent) 35%, color-mix(in srgb, var(--night) 72%, transparent))') =>
+  img ? { backgroundColor: 'var(--navy)', backgroundImage: `${overlay}, url(${img})` } as const : {};
 
 type Item =
   | { kind: 'event'; key: string; d: any }
@@ -128,7 +128,7 @@ export default function Home() {
     <div className="home">
       <section
         className="home-hero home-cover"
-        style={photo('/img/portada-colombia.jpg', 'linear-gradient(180deg, rgba(30,35,68,0.15) 0%, rgba(30,35,68,0.05) 35%, rgba(30,35,68,0.88) 100%)')}
+        style={photo('/img/portada-colombia.jpg', 'linear-gradient(180deg, color-mix(in srgb, var(--night) 15%, transparent) 0%, color-mix(in srgb, var(--night) 5%, transparent) 35%, color-mix(in srgb, var(--night) 88%, transparent) 100%)')}
         role="img"
         aria-label="Delegación de ULASALLE Arequipa en la Universidad de La Salle, Bogotá, con las banderas del Perú, La Salle Internacional y Arequipa"
       >
