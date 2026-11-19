@@ -41,9 +41,11 @@ async function sendCode(email: string, code: string) {
   return true;
 }
 
+export const CONSENT_VERSION = '2026-11';
+
 export default async function authRoutes(app: FastifyInstance) {
   app.post('/request-code', {
-    config: { rateLimit: { max: 5, timeWindow: '10 minutes', keyGenerator: (req) => String((req.body as any)?.email ?? req.ip).toLowerCase() } },
+    config: { rateLimit: { max: 5, timeWindow: '10 minutes', hook: 'preHandler', keyGenerator: (req) => String((req.body as any)?.email ?? req.ip).toLowerCase() } },
   }, async (req) => {
     const { email } = z.object({ email: z.string().email() }).parse(req.body);
     const e = email.trim().toLowerCase();
@@ -66,8 +68,12 @@ export default async function authRoutes(app: FastifyInstance) {
   });
 
   app.post('/verify', async (req) => {
-    const { email, code } = z.object({ email: z.string().email(), code: z.string().length(6) }).parse(req.body);
+    const { email, code, consent } = z.object({ email: z.string().email(), code: z.string().length(6), consent: z.boolean().optional() }).parse(req.body);
     const e = email.trim().toLowerCase();
+    const prev = await one<{ consent_at: Date | null }>('select consent_at from users where email = $1', [e]);
+    if (!prev?.consent_at && consent !== true) {
+      throw new HttpError(400, 'Para entrar debes aceptar la política de privacidad y el tratamiento de tus datos.');
+    }
     const row = await one<{ code_hash: string; expires_at: Date; attempts: number }>('select * from login_codes where email = $1', [e]);
     if (!row || row.expires_at < new Date()) throw new HttpError(400, 'El código venció. Pide uno nuevo.');
     if (row.attempts >= 5) throw new HttpError(429, 'Demasiados intentos. Pide un código nuevo.');
@@ -78,9 +84,12 @@ export default async function authRoutes(app: FastifyInstance) {
     await q('delete from login_codes where email = $1', [e]);
     const uni = await universityForEmail(e);
     const user = await one<{ id: string; name: string | null }>(
-      `insert into users (email, university_id) values ($1, $2)
-       on conflict (email) do update set last_seen = now() returning id, name`,
-      [e, uni?.id ?? null],
+      `insert into users (email, university_id, consent_at, consent_version) values ($1, $2, now(), $3)
+       on conflict (email) do update set last_seen = now(),
+         consent_at = coalesce(users.consent_at, excluded.consent_at),
+         consent_version = coalesce(users.consent_version, excluded.consent_version)
+       returning id, name`,
+      [e, uni?.id ?? null, CONSENT_VERSION],
     );
     const token = app.jwt.sign({ sub: user!.id, email: e });
     return { token, needsProfile: !user!.name };

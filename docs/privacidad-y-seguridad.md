@@ -22,4 +22,12 @@
 - Colombia: Ley 1581 de 2012 (protección de datos personales).
 - Perú: Ley 29733 (protección de datos personales).
 
-Antes del piloto se requiere una política de privacidad, consentimiento informado y un acuerdo con cada universidad sobre el uso de su nombre y de sus dominios de correo.
+## Cómo lo cumple la app
+
+- Consentimiento informado: para entrar, el estudiante marca la casilla que acepta la política de privacidad. La API rechaza crear la cuenta sin ese consentimiento y guarda la fecha y la versión (`users.consent_at`, `users.consent_version`, migración `002_consentimiento.sql`).
+- Política de privacidad pública en `/privacidad`, accesible sin iniciar sesión.
+- Derecho de supresión: desde Perfil, "Eliminar mi cuenta" borra al usuario y sus datos (`DELETE /api/me`). Lo publicado en comunidades y retos queda sin autor.
+- Derecho de rectificación: el estudiante edita su perfil en cualquier momento.
+- Pruebas automáticas que lo verifican: "sin consentimiento de datos no se crea la cuenta" y "el estudiante puede eliminar su cuenta y sus datos".
+
+Para el piloto con universidades queda pendiente el acuerdo con cada una sobre el uso de su nombre y de sus dominios de correo.

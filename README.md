@@ -25,6 +25,7 @@
 - Tablero público de impacto con datos agregados y anónimos para Bienestar Universitario.
 - Reportes de contenido y moderación.
 - PWA instalable con caché sin conexión.
+- Consentimiento informado al entrar, política de privacidad pública (`/privacidad`) y opción de eliminar la cuenta, conforme a la Ley N.° 29733 (Perú) y la Ley 1581 de 2012 (Colombia).
 
 ## Arquitectura
 
@@ -67,7 +68,7 @@ pnpm dev                         # API en :4000 y web en :5173
 
 ```bash
 createdb parche_test             # base de datos de pruebas
-pnpm test                        # 9 pruebas de integración de la API
+pnpm test                        # 12 pruebas de integración de la API
 ```
 
 ### Publicar en internet (Render)
@@ -78,6 +79,23 @@ El `Dockerfile` de la raíz arma una sola imagen: la API sirve también la app w
 2. New > Blueprint > elige este repositorio > Apply.
 3. Los planes gratis de Render bloquean el correo SMTP, así que los códigos se envían con la API de Brevo (gratis, 300 correos al día). En https://brevo.com crea una cuenta, verifica tu correo remitente y genera una API key. En el servicio `parche`, pestaña Environment, define `BREVO_API_KEY` y `MAIL_FROM` (por ejemplo `Parche <tucorreo@gmail.com>`, con el mismo correo verificado). En un plan pagado también puedes usar `SMTP_URL`.
 4. Comparte la dirección `https://parche-xxxx.onrender.com` que muestra Render.
+
+## Feria Concurso de Proyectos Digitales 2026 (ULASALLE)
+
+Parche también se presenta a la Feria Concurso "Apps que transforman mi comunidad" de la Escuela de Ingeniería de Software (19 de noviembre de 2026, auditorio Benito), categoría A.
+
+| Requisito de las bases | Cómo lo cumple Parche |
+| --- | --- |
+| Comunidad concreta y problema delimitado | Estudiantes de ULASALLE Arequipa y de la red La Salle en Colombia: aprender solos, no encontrar a quién preguntar y abandonar. Evidencias en [`docs/propuesta-de-valor.md`](docs/propuesta-de-valor.md) y fotos de la Misión Académica Colombia 2026. |
+| Eje temático | Educación y alfabetización digital, con retos de turismo, agua y agro en territorios rurales. |
+| MVP demostrable en vivo | https://parche-bokw.onrender.com (modo demostración con usuarios de ejemplo). |
+| Repositorio con aportes de todo el equipo | Este repositorio, con commits de ambos integrantes. |
+| Ley N.° 29733 y consentimiento | Casilla de consentimiento obligatoria, política en `/privacidad` y eliminación de cuenta. Ver [`docs/privacidad-y-seguridad.md`](docs/privacidad-y-seguridad.md). |
+| Pruebas | 12 pruebas de integración de la API (`pnpm test`). |
+
+Detalle por criterio de la rúbrica y guion de la demostración en [`docs/feria-2026.md`](docs/feria-2026.md).
+
+**Uso de herramientas de IA y librerías.** El equipo usó Claude (Anthropic) como asistente de programación y redacción, lo que se ve en el historial del repositorio. Librerías principales: React, Vite, Fastify, Zod, Leaflet, Workbox y lucide-react. Las fotos son propias de la delegación ([`docs/creditos-imagenes.md`](docs/creditos-imagenes.md)).
 
 ## Documentos de la entrega
 
@@ -92,6 +110,7 @@ El `Dockerfile` de la raíz arma una sola imagen: la API sirve también la app w
 - [`docs/impacto-y-metricas.md`](docs/impacto-y-metricas.md): indicadores y metas del piloto
 - [`docs/despliegue-aws.md`](docs/despliegue-aws.md): cómo desplegar en AWS
 - [`docs/privacidad-y-seguridad.md`](docs/privacidad-y-seguridad.md): datos personales y protección
+- [`docs/feria-2026.md`](docs/feria-2026.md): alineación con las bases y la rúbrica de la Feria Concurso 2026
 
 ## Equipo
 
@@ -100,6 +119,6 @@ El `Dockerfile` de la raíz arma una sola imagen: la API sirve también la app w
 | José Luis Hancco Valencia | Líder del proyecto, propuesta de valor y desarrollo | [@jhanccov](https://github.com/jhanccov) |
 | Roger Infa Sanchez | Desarrollo full stack e identidad visual | [@rogerinfas](https://github.com/rogerinfas) |
 
-Estudiantes de Ingeniería de Software de la Universidad La Salle (Arequipa, Perú), en colaboración con la red La Salle de Colombia. Proyecto para el Evento Internacional de Innovación Tecnológica de La Salle Engineering and Technology School Alliance (noviembre de 2026).
+Estudiantes de Ingeniería de Software de la Universidad La Salle (Arequipa, Perú), en colaboración con la red La Salle de Colombia. Proyecto para el Evento Internacional de Innovación Tecnológica de La Salle Engineering and Technology School Alliance y para la Feria Concurso de Proyectos Digitales 2026 de ULASALLE (noviembre de 2026).
 
 Los retos y usuarios incluidos en los datos de demostración son ejemplos ilustrativos.

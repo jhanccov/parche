@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Award, FileText, LogOut, Pencil } from 'lucide-react';
+import { Award, FileText, LogOut, Pencil, Trash2 } from 'lucide-react';
+import { api } from '../lib/api';
 import { useAuth } from '../lib/auth';
 import { Avatar, Chip, Section, Stat } from '../components/ui';
 import { ProfileForm } from './Onboarding';
@@ -8,7 +9,13 @@ import { ProfileForm } from './Onboarding';
 export default function Profile() {
   const { me, signOut } = useAuth();
   const [edit, setEdit] = useState(false);
+  const [confirmDel, setConfirmDel] = useState(false);
   if (!me) return null;
+
+  async function removeAccount() {
+    await api('/me', { method: 'DELETE' });
+    signOut();
+  }
   return (
     <div className="page">
       <div className="profile-head card">
@@ -46,6 +53,18 @@ export default function Profile() {
       </div>
 
       {edit && <div className="card"><ProfileForm onDone={() => setEdit(false)} submitLabel="Guardar cambios" /></div>}
+
+      <Section title="Tus datos">
+        <p className="muted small">Puedes ver la <Link to="/privacidad">política de privacidad</Link> o eliminar tu cuenta. Al eliminarla se borran tu perfil, tus mensajes y tus solicitudes de ayuda; lo que publicaste en comunidades y retos queda sin autor.</p>
+        {!confirmDel ? (
+          <button className="btn ghost" onClick={() => setConfirmDel(true)}><Trash2 size={16} /> Eliminar mi cuenta</button>
+        ) : (
+          <div className="row gap wrap">
+            <button className="btn danger" onClick={removeAccount}><Trash2 size={16} /> Sí, eliminar mis datos</button>
+            <button className="btn ghost" onClick={() => setConfirmDel(false)}>Cancelar</button>
+          </div>
+        )}
+      </Section>
     </div>
   );
 }

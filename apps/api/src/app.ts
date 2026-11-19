@@ -40,11 +40,12 @@ export class HttpError extends Error {
 }
 
 export async function buildApp() {
-  const app = Fastify({ logger: process.env.NODE_ENV === 'test' ? false : { level: 'info' } });
+  // trustProxy: en Render la app va detrás de un proxy; sin esto todos los usuarios compartirían la misma IP y el mismo límite.
+  const app = Fastify({ trustProxy: true, logger: process.env.NODE_ENV === 'test' ? false : { level: 'info' } });
 
   await app.register(cors, { origin: config.webOrigin });
   await app.register(jwt, { secret: config.jwtSecret, sign: { expiresIn: '30d' } });
-  await app.register(rateLimit, { max: 300, timeWindow: '1 minute' });
+  await app.register(rateLimit, { max: 600, timeWindow: '1 minute' });
 
   app.decorate('auth', async (req: FastifyRequest) => {
     try {

@@ -36,6 +36,13 @@ export default async function meRoutes(app: FastifyInstance) {
     return getUser(req.user.sub);
   });
 
+  // Derecho de supresión (Ley 29733, art. 20): borra la cuenta y sus datos personales.
+  // Lo publicado en comunidades y retos queda sin autor; mensajes y ayudas propias se eliminan.
+  app.delete('/', async (req, reply) => {
+    await q('delete from users where id = $1', [req.user.sub]);
+    return reply.code(204).send();
+  });
+
   app.get('/activity', async (req) => {
     const id = req.user.sub;
     const [communities, help, teams] = await Promise.all([

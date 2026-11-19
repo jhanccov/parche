@@ -16,7 +16,7 @@ async function login(email: string) {
   const r1 = await app.inject({ method: 'POST', url: '/api/auth/request-code', payload: { email } });
   assert.equal(r1.statusCode, 200, r1.body);
   const code = r1.json().devCode;
-  const r2 = await app.inject({ method: 'POST', url: '/api/auth/verify', payload: { email, code } });
+  const r2 = await app.inject({ method: 'POST', url: '/api/auth/verify', payload: { email, code, consent: true } });
   assert.equal(r2.statusCode, 200, r2.body);
   return r2.json() as { token: string; needsProfile: boolean };
 }
@@ -47,6 +47,22 @@ describe('Parche API', () => {
   test('rechaza correos fuera de la red La Salle', async () => {
     const r = await app.inject({ method: 'POST', url: '/api/auth/request-code', payload: { email: 'alguien@gmail.com' } });
     assert.equal(r.statusCode, 403);
+  });
+
+  test('sin consentimiento de datos no se crea la cuenta', async () => {
+    const email = 'sin.consentimiento@ulasalle.edu.pe';
+    const r1 = await app.inject({ method: 'POST', url: '/api/auth/request-code', payload: { email } });
+    const r2 = await app.inject({ method: 'POST', url: '/api/auth/verify', payload: { email, code: r1.json().devCode } });
+    assert.equal(r2.statusCode, 400);
+    const row = await pool.query('select 1 from users where email = $1', [email]);
+    assert.equal(row.rowCount, 0);
+  });
+
+  test('el límite de códigos es por correo: muchos estudiantes en la misma red wifi pueden entrar', async () => {
+    for (let i = 0; i < 8; i++) {
+      const r = await app.inject({ method: 'POST', url: '/api/auth/request-code', payload: { email: `feria${i}@ulasalle.edu.pe` } });
+      assert.equal(r.statusCode, 200, r.body);
+    }
   });
 
   test('un código incorrecto no inicia sesión', async () => {
@@ -145,5 +161,13 @@ describe('Parche API', () => {
     const keys = Object.keys(r.json());
     assert.deepEqual(keys.sort(), ['campuses', 'challenges', 'communities', 'events', 'help']);
     assert.ok(!JSON.stringify(r.json()).includes('email'));
+  });
+
+  test('el estudiante puede eliminar su cuenta y sus datos', async () => {
+    const { token } = await login('borrar.cuenta@unisalle.edu.co');
+    const r = await call(token, 'DELETE', '/api/me');
+    assert.equal(r.statusCode, 204);
+    const row = await pool.query('select 1 from users where email = $1', ['borrar.cuenta@unisalle.edu.co']);
+    assert.equal(row.rowCount, 0);
   });
 });

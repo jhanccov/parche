@@ -5,6 +5,7 @@ import { Loading } from './components/ui';
 import { useAuth } from './lib/auth';
 import Login from './pages/Login';
 import Onboarding from './pages/Onboarding';
+import Privacy from './pages/Privacy';
 import Home from './pages/Home';
 import MapPage from './pages/MapPage';
 import Communities from './pages/Communities';
@@ -32,6 +33,7 @@ export default function App() {
   return (
     <Routes>
       <Route path="/entrar" element={<Login />} />
+      <Route path="/privacidad" element={<Privacy />} />
       <Route path="/bienvenida" element={<Guard><Onboarding /></Guard>} />
       <Route path="/constancia" element={<Guard><Certificate /></Guard>} />
       <Route element={<Guard><Layout /></Guard>}>
