@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 import { AttributionControl, MapContainer, Marker, Popup, TileLayer, ZoomControl } from 'react-leaflet';
 import L, { LatLngBoundsExpression } from 'leaflet';
 import { renderToStaticMarkup } from 'react-dom/server';
-import { CircleHelp, GraduationCap, Mountain, Star, Users, Wheat, LucideIcon } from 'lucide-react';
+import { Box, CircleHelp, GraduationCap, Mountain, Star, Users, Wheat, LucideIcon } from 'lucide-react';
 import { useApi } from '../lib/useApi';
 import { useAuth } from '../lib/auth';
 import { CATEGORIES, when } from '../lib/format';
@@ -81,6 +81,7 @@ export default function MapPage() {
   return (
     <div className="map-page">
       <div className="map-filters">
+        <Link className="view campus-link" to="/campus"><Box size={15} /> Campus 3D Arequipa</Link>
         <button className="view" onClick={() => setView(view === 'sede' ? 'red' : 'sede')}>{view === 'sede' ? 'Ver toda la red' : 'Ver mi sede'}</button>
         {LAYERS.map((l) => (
           <button key={l.id} className={on[l.id] ? 'on' : ''} onClick={() => setOn({ ...on, [l.id]: !on[l.id] })}>{l.label}</button>

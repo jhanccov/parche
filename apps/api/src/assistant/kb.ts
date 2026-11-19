@@ -19,6 +19,7 @@ export const ROUTES: Record<string, string> = {
   '/privacidad': 'Política de privacidad',
   '/noticias': 'La Salle hoy',
   '/noticias/reels': 'Noticias en modo vertical',
+  '/campus': 'Campus 3D Arequipa',
 };
 
 const go = (to: string, label = ROUTES[to]): Action => ({ label, to });
@@ -131,6 +132,12 @@ export const KB: Entry[] = [
     keywords: ['noticias', 'la salle hoy', 'tech hoy', 'novedades', 'que hay de nuevo', 'red la salle', 'otras universidades', 'videos', 'youtube', 'redes sociales', 'redes oficiales', 'instagram', 'facebook', 'arequipa', 'ulasalle', 'colombia', 'mexico', 'tecnologia actual', 'enterarme', 'actualidad'],
     answer: 'En "La Salle hoy" (el ícono de periódico arriba) primero va Arequipa, luego Colombia y México, y después el resto de la red La Salle. En "Redes oficiales" ves el Facebook de ULASALLE con un toque, y los enlaces a su Instagram y a las cuentas de Unisalle y La Salle México. Abajo están las noticias de los sitios oficiales y los videos de YouTube; cada publicación enlaza a la original. En el inicio y en "Modo vertical" las ves una por pantalla y deslizas hacia arriba, como en TikTok.',
     actions: [go('/noticias', 'La Salle hoy'), go('/noticias/reels'), go('/perfil', 'Ajustar mis temas')],
+  },
+  {
+    id: 'campus',
+    keywords: ['campus', '3d', 'metaverso', 'maqueta', 'recorrido', 'recorrido virtual', 'glorieta', 'cafeteria', 'pabellon', 'donde queda', 'ulasalle arequipa', 'misti'],
+    answer: 'En "Campus 3D Arequipa" recorres una maqueta de ULASALLE: el pabellón de aulas, el jardín, la glorieta, la terraza cafetería, la terraza de eventos y el mirador al Misti. Gira con el dedo, acerca con dos dedos y toca un lugar para ver qué puedes hacer ahí en Parche. Está en el mapa y en el menú "+".',
+    actions: [go('/campus'), go('/mapa', 'Mapa de la red')],
   },
   {
     id: 'saludo',

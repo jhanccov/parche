@@ -1,4 +1,4 @@
-import { ReactNode } from 'react';
+import { ReactNode, Suspense, lazy } from 'react';
 import { Navigate, Route, Routes, useLocation } from 'react-router-dom';
 import Layout from './components/Layout';
 import { Loading } from './components/ui';
@@ -21,6 +21,8 @@ import NewsReels from './components/NewsReels';
 import NewsPage from './pages/News';
 import Profile from './pages/Profile';
 import Certificate from './pages/Certificate';
+// El campus 3D carga three.js solo cuando se abre, para no hacer más pesada la app.
+const Campus = lazy(() => import('./pages/Campus'));
 
 function Guard({ children }: { children: ReactNode }) {
   const { me, loading } = useAuth();
@@ -52,6 +54,7 @@ export default function App() {
         <Route path="retos/:id" element={<ChallengeDetail />} />
         <Route path="impacto" element={<Impact />} />
         <Route path="noticias" element={<NewsPage />} />
+        <Route path="campus" element={<Suspense fallback={<Loading />}><Campus /></Suspense>} />
         <Route path="perfil" element={<Profile />} />
       </Route>
       <Route path="*" element={<Navigate to="/" replace />} />

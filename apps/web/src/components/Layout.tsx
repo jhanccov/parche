@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { NavLink, Link, Outlet, useLocation } from 'react-router-dom';
-import { Home, Map, Users, HandHelping, Mountain, Plus, Sparkles, Share2, LifeBuoy, Rocket, Sparkle, ChevronRight, X, ArrowRight, Newspaper } from 'lucide-react';
+import { Home, Map, Users, HandHelping, Mountain, Plus, Sparkles, Share2, LifeBuoy, Rocket, Sparkle, ChevronRight, X, ArrowRight, Newspaper, Box } from 'lucide-react';
 import { useAuth } from '../lib/auth';
 import { shareLink } from '../lib/fx';
 import { Avatar } from './ui';
@@ -121,6 +121,11 @@ export default function Layout() {
           <Link to="/retos" className="sheet-row">
             <span className="sheet-ico navy"><Mountain size={22} /></span>
             <span className="sheet-text"><strong>Unirme a un reto</strong><small>Problemas reales del territorio</small></span>
+            <ChevronRight size={20} className="sheet-chev" aria-hidden />
+          </Link>
+          <Link to="/campus" className="sheet-row">
+            <span className="sheet-ico navy"><Box size={22} /></span>
+            <span className="sheet-text"><strong>Campus 3D Arequipa</strong><small>Recorre ULASALLE y sus lugares</small></span>
             <ChevronRight size={20} className="sheet-chev" aria-hidden />
           </Link>
           <button className="sheet-row" onClick={() => shareLink('Únete a mi parche')}>
