@@ -40,6 +40,7 @@
   --campus-orange: #C65A34;
   --campus-stone: #3B3836;
   --campus-asphalt: #8A8D92;
+  --campus-water: #7FAFCB;
 
   /* Derivados: mezclas de la paleta, no colores nuevos */
   --card: var(--white);
