@@ -6,7 +6,8 @@ import type { NewsItem } from './fetcher.js';
 type Featured = Omit<NewsItem, 'topics'>;
 const now = () => new Date().toISOString();
 const f = (id: string, title: string, summary: string, url: string, source: string, lang: 'es' | 'en'): Featured => ({
-  id: `featured:${id}`, title, summary, url, image: null, source, sourceId: `featured-${id}`, group: 'lasalle', lang, featured: true, publishedAt: now(),
+  id: `featured:${id}`, title, summary, url, image: null, source, sourceId: `featured-${id}`, group: 'lasalle', lang,
+  region: url.includes('lasalle.edu.co') ? 'colombia' : url.includes('ulasalle.edu.pe') ? 'arequipa' : url.includes('lasalle.mx') ? 'mexico' : 'mundo', featured: true, publishedAt: now(),
 });
 
 export const FEATURED: Featured[] = [

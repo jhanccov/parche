@@ -32,3 +32,8 @@
 - Pruebas automáticas que lo verifican: "sin consentimiento de datos no se crea la cuenta" y "el estudiante puede eliminar su cuenta y sus datos".
 
 Para el piloto con universidades queda pendiente el acuerdo con cada una sobre el uso de su nombre y de sus dominios de correo.
+
+
+## Redes oficiales en La Salle hoy
+
+El recuadro de Facebook de las páginas oficiales (por ejemplo ULASALLE) es el plugin oficial de Facebook y no se carga hasta que el estudiante lo toca. Así nadie se conecta con Facebook sin decidirlo. Instagram, TikTok, X y los sitios web solo son enlaces que abren fuera de Parche. Parche no lee ni guarda datos de esas redes.

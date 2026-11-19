@@ -44,6 +44,12 @@ export default function Privacy() {
         sin enviar ningún dato tuyo; para ordenarlas solo usamos, dentro de Parche, los temas que marcaste en tu perfil.
         Las imágenes se cargan desde el sitio de cada fuente y, al abrir una publicación o un video, sales a su página.
       </p>
+      <p>
+        En "Redes oficiales" (Arequipa, Colombia y México) hay enlaces a las cuentas oficiales de cada universidad y, para
+        páginas públicas de Facebook, el recuadro oficial de Facebook. Ese recuadro no se carga hasta que tú lo tocas: en ese
+        momento tu navegador se conecta con Facebook, que puede usar sus propias cookies según su política. Parche no recibe
+        ni guarda nada de esa conexión.
+      </p>
 
       <h2>Tus derechos</h2>
       <p>

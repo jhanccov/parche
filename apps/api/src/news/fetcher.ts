@@ -1,5 +1,5 @@
 import { XMLParser } from 'fast-xml-parser';
-import { SKILL_TOPICS, SOURCES, Source, TOPICS, Group } from './sources.js';
+import { REGION_BOOST, REGIONS, Region, SKILL_TOPICS, SOURCES, Source, TOPICS, Group } from './sources.js';
 import { FEATURED } from './featured.js';
 
 export type NewsItem = {
@@ -11,6 +11,7 @@ export type NewsItem = {
   source: string;
   sourceId: string;
   group: Group;
+  region: Region;
   kind?: 'video';
   featured?: boolean;
   lang: 'es' | 'en' | 'pt';
@@ -84,7 +85,7 @@ function imageFrom(it: any): string | null {
   return null;
 }
 
-export function parseFeed(xml: string, src: Pick<Source, 'id' | 'name' | 'group' | 'lang'>): NewsItem[] {
+export function parseFeed(xml: string, src: Pick<Source, 'id' | 'name' | 'group' | 'lang' | 'region'>): NewsItem[] {
   const doc = parser.parse(xml);
   const rssItems = arr(doc?.rss?.channel?.item);
   const atomItems = arr(doc?.feed?.entry);
@@ -97,7 +98,7 @@ export function parseFeed(xml: string, src: Pick<Source, 'id' | 'name' | 'group'
     const date = new Date(it.pubDate ?? it.published ?? it.updated ?? it['dc:date'] ?? Date.now());
     return [{
       id: `${src.id}:${link}`, title, summary, url: link, image: imageFrom(it), source: src.name, sourceId: src.id,
-      group: src.group, lang: src.lang, publishedAt: (isNaN(+date) ? new Date() : date).toISOString(), topics: classify(`${title} ${summary}`),
+      group: src.group, region: src.region, lang: src.lang, publishedAt: (isNaN(+date) ? new Date() : date).toISOString(), topics: classify(`${title} ${summary}`),
     }];
   });
 }
@@ -121,7 +122,7 @@ async function fetchWp(src: Extract<Source, { kind: 'wp' }>): Promise<NewsItem[]
         const sizes = media?.media_details?.sizes ?? {};
         const image = safeUrl(sizes.medium_large?.source_url ?? sizes.large?.source_url ?? media?.source_url);
         const summary = cleanText(p.excerpt?.rendered, 220);
-        return [{ id: `${src.id}:${p.id}`, title, summary, url, image, source: src.name, sourceId: src.id, group: src.group, lang: src.lang,
+        return [{ id: `${src.id}:${p.id}`, title, summary, url, image, source: src.name, sourceId: src.id, group: src.group, region: src.region, lang: src.lang,
           publishedAt: new Date(p.date_gmt ? `${p.date_gmt}Z` : p.date ?? Date.now()).toISOString(), topics: classify(`${title} ${summary}`) }];
       });
       if (items.length) return items;
@@ -144,7 +145,7 @@ async function fetchYoutube(src: Extract<Source, { kind: 'youtube' }>): Promise<
     const group = e['media:group'] ?? {};
     return [{ id: `${src.id}:${vid || url}`, title, summary: cleanText(group['media:description'], 160), url,
       image: safeUrl(group['media:thumbnail']?.['@url']) ?? (vid ? `https://i.ytimg.com/vi/${vid}/hqdefault.jpg` : null),
-      source: src.name, sourceId: src.id, group: src.group, kind: 'video' as const, lang: src.lang,
+      source: src.name, sourceId: src.id, group: src.group, region: src.region, kind: 'video' as const, lang: src.lang,
       publishedAt: new Date(e.published ?? Date.now()).toISOString(), topics: classify(title) }];
   });
 }
@@ -177,11 +178,11 @@ export function clearNewsCache() { cache.clear(); }
 export function newsStatus() {
   return SOURCES.map((s) => {
     const e = cache.get(s.id);
-    return { id: s.id, name: s.name, ok: e?.ok ?? false, count: e?.items.length ?? 0, checkedAt: e ? new Date(e.fetchedAt).toISOString() : null, error: e?.error ?? null };
+    return { id: s.id, name: s.name, region: s.region, ok: e?.ok ?? false, count: e?.items.length ?? 0, checkedAt: e ? new Date(e.fetchedAt).toISOString() : null, error: e?.error ?? null };
   });
 }
 
-export async function getNews(opts: { group?: Group | 'all'; topic?: string; interests?: string[]; limit?: number }) {
+export async function getNews(opts: { group?: Group | 'all'; region?: Region; topic?: string; interests?: string[]; limit?: number }) {
   const stale = SOURCES.some((s) => { const e = cache.get(s.id); return !e || Date.now() - e.fetchedAt > TTL_MS; });
   const empty = SOURCES.every((s) => !cache.get(s.id)?.items.length);
   if (empty) await refreshAll();
@@ -193,14 +194,15 @@ export async function getNews(opts: { group?: Group | 'all'; topic?: string; int
   const usingFeatured = !items.some((i) => i.group === 'lasalle');
   if (usingFeatured) items = [...items, ...FEATURED.map((f) => ({ ...f, topics: classify(`${f.title} ${f.summary}`) }))];
   if (opts.group && opts.group !== 'all') items = items.filter((i) => i.group === opts.group);
+  if (opts.region) items = items.filter((i) => i.region === opts.region);
   if (opts.topic) items = items.filter((i) => i.topics.includes(opts.topic!));
   const ranked = items.map((i) => {
     const forYou = i.topics.some((t) => mine.includes(t));
     const ageH = (Date.now() - new Date(i.publishedAt).getTime()) / 36e5;
-    // Prioridad: lo que le interesa al estudiante, luego lo que está en español y con foto, y lo reciente.
-    // La popularidad (puntos o reacciones) solo suma un poco para no tapar a los medios en español.
+    // Prioridad: Arequipa, Colombia y México primero; luego lo que le interesa al estudiante,
+    // lo que está en español y con foto, y lo reciente.
     const popular = Math.min(1.5, Math.log10(1 + (i.score ?? 0)) / 2);
-    const rank = (forYou ? 4 : 0) + (i.lang === 'es' ? 3 : 0) + (i.image ? 1 : 0) + popular - ageH / 24;
+    const rank = REGION_BOOST[i.region] + (forYou ? 4 : 0) + (i.lang === 'es' ? 3 : 0) + (i.image ? 1 : 0) + popular - Math.min(14, ageH / 24);
     return { ...i, forYou, rank };
   });
   ranked.sort((a, b) => b.rank - a.rank);
@@ -214,9 +216,10 @@ export async function getNews(opts: { group?: Group | 'all'; topic?: string; int
   }
   return {
     items: out.map(({ rank, score, ...i }) => i),
+    regions: REGIONS.map((r) => ({ ...r, count: [...cache.values()].flatMap((e) => e.items).filter((i) => i.region === r.id).length })),
     topics: Object.entries(TOPICS).map(([id, t]) => ({ id, label: t.label, mine: mine.includes(id) })),
     // Solo se acreditan las fuentes que de verdad aportan noticias.
-    sources: SOURCES.filter((s) => (cache.get(s.id)?.items.length ?? 0) > 0 || !s.optional).map((s) => ({ id: s.id, name: s.name, site: s.site, group: s.group, ok: cache.get(s.id)?.ok ?? false, count: cache.get(s.id)?.items.length ?? 0 })),
+    sources: SOURCES.filter((s) => (cache.get(s.id)?.items.length ?? 0) > 0 || !s.optional).map((s) => ({ id: s.id, name: s.name, site: s.site, group: s.group, region: s.region, ok: cache.get(s.id)?.ok ?? false, count: cache.get(s.id)?.items.length ?? 0 })),
     hasVideos: SOURCES.some((s) => s.kind === 'youtube'),
     featured: usingFeatured,
     updatedAt: Math.max(0, ...[...cache.values()].map((e) => e.fetchedAt)) || null,

@@ -636,3 +636,31 @@ body.dark-page { background: var(--night); color: var(--white); }
 .news-video:hover .news-play { background: var(--gold); color: var(--night); }
 @media (min-width: 700px) { .news-card.is-video .news-video { width: 240px; flex: 0 0 240px; } .news-card.is-video .news-video .news-img { width: 100%; height: 100%; } }
 .news-featured { display: inline-flex; align-items: center; gap: 3px; color: var(--gold-ink); font-weight: 800; }
+
+/* Redes oficiales de la red La Salle (Arequipa, Colombia, México) */
+.news-region { display: inline-flex; align-items: center; gap: 3px; font-size: 11.5px; font-weight: 800; color: var(--navy); background: var(--navy-soft); border-radius: 99px; padding: 2px 8px; }
+.social-wall { display: flex; flex-direction: column; gap: 12px; padding: 14px; }
+.social-head { display: flex; flex-direction: column; gap: 10px; }
+.social-head h2 { margin: 0; font-size: 18px; color: var(--navy); display: inline-flex; align-items: center; gap: 6px; }
+.social-head h2 svg { color: var(--gold-ink); }
+.social-regions { display: flex; gap: 6px; overflow-x: auto; scrollbar-width: none; }
+.social-regions button { flex: 0 0 auto; border: 1.5px solid var(--line); background: var(--bg); color: var(--navy); border-radius: 999px; padding: 6px 12px; font: inherit; font-weight: 700; font-size: 13.5px; }
+.social-regions button.on { background: var(--gold); border-color: var(--gold); color: var(--night); }
+.fb-box { width: 100%; max-width: 500px; margin: 0 auto; }
+.fb-box iframe { display: block; border: 0; border-radius: 14px; overflow: hidden; background: var(--white); max-width: 100%; }
+.fb-load { width: 100%; display: flex; align-items: center; gap: 12px; text-align: left; border: 1.5px dashed var(--navy2); background: var(--navy-mist); color: var(--navy); border-radius: 16px; padding: 14px; font: inherit; cursor: pointer; }
+.fb-load:hover { background: var(--navy-soft); }
+.fb-load strong { display: block; font-size: 15px; }
+.fb-load small { display: inline-flex; align-items: center; gap: 4px; color: var(--muted); font-size: 12.5px; margin-top: 2px; }
+.fb-load-ico { flex: 0 0 auto; width: 44px; height: 44px; border-radius: 50%; display: grid; place-items: center; background: var(--navy); color: var(--white); }
+.social-links { display: grid; grid-template-columns: repeat(auto-fill, minmax(210px, 1fr)); gap: 8px; }
+.social-link { display: flex; align-items: center; gap: 10px; padding: 10px 12px; border: 1px solid var(--line); border-radius: 14px; background: var(--white); color: var(--navy); text-decoration: none; min-width: 0; }
+.social-link:hover { border-color: var(--gold); background: var(--gold-soft); }
+.social-ico { flex: 0 0 auto; width: 34px; height: 34px; border-radius: 10px; display: grid; place-items: center; background: var(--navy-soft); color: var(--navy); }
+.social-link.net-instagram .social-ico, .social-link.net-tiktok .social-ico { background: var(--gold-soft); color: var(--gold-ink); }
+.social-txt { display: flex; flex-direction: column; min-width: 0; }
+.social-txt strong { font-size: 14px; }
+.social-txt small { font-size: 12px; color: var(--muted); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.social-go { margin-left: auto; flex: 0 0 auto; color: var(--muted); }
+.social-note { margin: 0; font-size: 13px; color: var(--muted); text-align: center; }
+.tech-card.social .social-ph { background: var(--navy); color: var(--sun); }

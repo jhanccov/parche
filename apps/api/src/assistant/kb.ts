@@ -127,8 +127,8 @@ export const KB: Entry[] = [
   },
   {
     id: 'noticias',
-    keywords: ['noticias', 'la salle hoy', 'tech hoy', 'novedades', 'que hay de nuevo', 'red la salle', 'otras universidades', 'videos', 'youtube', 'redes sociales', 'instagram', 'tecnologia actual', 'enterarme', 'actualidad'],
-    answer: 'En "La Salle hoy" (el ícono de periódico arriba) ves solo contenido oficial de la red La Salle: noticias de lasalle.org y de universidades La Salle de varios países, y videos de sus canales de YouTube. Cada publicación enlaza a la original. Instagram y otras redes necesitan autorización de cada universidad, por eso aún no se muestran.',
+    keywords: ['noticias', 'la salle hoy', 'tech hoy', 'novedades', 'que hay de nuevo', 'red la salle', 'otras universidades', 'videos', 'youtube', 'redes sociales', 'redes oficiales', 'instagram', 'facebook', 'arequipa', 'ulasalle', 'colombia', 'mexico', 'tecnologia actual', 'enterarme', 'actualidad'],
+    answer: 'En "La Salle hoy" (el ícono de periódico arriba) primero va Arequipa, luego Colombia y México, y después el resto de la red La Salle. En "Redes oficiales" ves el Facebook de ULASALLE con un toque, y los enlaces a su Instagram y a las cuentas de Unisalle y La Salle México. Abajo están las noticias de los sitios oficiales y los videos de YouTube; cada publicación enlaza a la original.',
     actions: [go('/noticias', 'La Salle hoy'), go('/perfil', 'Ajustar mis temas')],
   },
   {

@@ -1,7 +1,17 @@
-// Fuentes gratuitas y sin clave para la sección "Tech hoy".
+// Fuentes oficiales de la red La Salle para la sección "La Salle hoy".
 // Solo se muestran título, resumen corto, medio y enlace a la nota original.
 export type Group = 'lasalle' | 'video';
-type Base = { id: string; name: string; site: string; group: Group; lang: 'es' | 'en' | 'pt'; optional?: boolean };
+// Región para priorizar: primero Arequipa, luego Colombia y México, luego el resto de la red.
+export type Region = 'arequipa' | 'colombia' | 'mexico' | 'mundo';
+export const REGIONS: { id: Region; label: string }[] = [
+  { id: 'arequipa', label: 'Arequipa' },
+  { id: 'colombia', label: 'Colombia' },
+  { id: 'mexico', label: 'México' },
+  { id: 'mundo', label: 'Mundo' },
+];
+export const REGION_BOOST: Record<Region, number> = { arequipa: 20, colombia: 16, mexico: 12, mundo: 0 };
+const isRegion = (r: string | undefined): r is Region => !!r && REGIONS.some((x) => x.id === r);
+type Base = { id: string; name: string; site: string; group: Group; lang: 'es' | 'en' | 'pt'; region: Region; optional?: boolean };
 export type Source =
   | (Base & { kind: 'rss'; url: string })
   | (Base & { kind: 'wp'; bases: string[] })
@@ -10,28 +20,35 @@ export type Source =
 // Solo fuentes oficiales de la red La Salle. Cada una se prueba en cada actualización;
 // las que no responden no se muestran ni se acreditan.
 const BASE_SOURCES: Source[] = [
-  { id: 'lasalleorg', name: 'La Salle (lasalle.org)', site: 'https://www.lasalle.org', group: 'lasalle', lang: 'es', kind: 'wp', bases: ['https://www.lasalle.org', 'https://www.lasalle.org/en'] },
-  { id: 'lasalle-philadelphia', name: 'La Salle University (Filadelfia)', site: 'https://www.lasalle.edu', group: 'lasalle', lang: 'en', kind: 'wp', bases: ['https://www.lasalle.edu'], optional: true },
-  { id: 'dlsu-manila', name: 'De La Salle University (Manila)', site: 'https://www.dlsu.edu.ph', group: 'lasalle', lang: 'en', kind: 'wp', bases: ['https://www.dlsu.edu.ph'], optional: true },
-  { id: 'unisalle', name: 'Universidad de La Salle (Bogotá)', site: 'https://www.lasalle.edu.co', group: 'lasalle', lang: 'es', kind: 'rss', url: 'https://www.lasalle.edu.co/rss.xml', optional: true },
-  { id: 'salleurl', name: 'La Salle Campus Barcelona', site: 'https://www.salleurl.edu', group: 'lasalle', lang: 'es', kind: 'rss', url: 'https://www.salleurl.edu/es/rss.xml', optional: true },
+  // Prioridad: Arequipa, Colombia y México
+  { id: 'ulasalle', name: 'Universidad La Salle (Arequipa)', site: 'https://www.ulasalle.edu.pe', group: 'lasalle', lang: 'es', region: 'arequipa', kind: 'wp', bases: ['https://www.ulasalle.edu.pe'], optional: true },
+  { id: 'unisalle', name: 'Universidad de La Salle (Bogotá)', site: 'https://www.lasalle.edu.co', group: 'lasalle', lang: 'es', region: 'colombia', kind: 'rss', url: 'https://www.lasalle.edu.co/rss.xml', optional: true },
+  { id: 'lasalle-mx', name: 'Universidad La Salle México', site: 'https://lasalle.mx', group: 'lasalle', lang: 'es', region: 'mexico', kind: 'wp', bases: ['https://lasalle.mx', 'https://academia.lasalle.mx'], optional: true },
+  // Resto de la red
+  { id: 'lasalleorg', name: 'La Salle (lasalle.org)', site: 'https://www.lasalle.org', group: 'lasalle', lang: 'es', region: 'mundo', kind: 'wp', bases: ['https://www.lasalle.org', 'https://www.lasalle.org/en'] },
+  { id: 'lasalle-philadelphia', name: 'La Salle University (Filadelfia)', site: 'https://www.lasalle.edu', group: 'lasalle', lang: 'en', region: 'mundo', kind: 'wp', bases: ['https://www.lasalle.edu'], optional: true },
+  { id: 'dlsu-manila', name: 'De La Salle University (Manila)', site: 'https://www.dlsu.edu.ph', group: 'lasalle', lang: 'en', region: 'mundo', kind: 'wp', bases: ['https://www.dlsu.edu.ph'], optional: true },
+  { id: 'salleurl', name: 'La Salle Campus Barcelona', site: 'https://www.salleurl.edu', group: 'lasalle', lang: 'es', region: 'mundo', kind: 'rss', url: 'https://www.salleurl.edu/es/rss.xml', optional: true },
 ];
 
 // Fuentes extra sin tocar el código, desde variables de entorno en Render:
-// NEWS_YOUTUBE_CHANNELS = "Nombre|UCxxxxxxxx; Otro canal|UCyyyyyyyy"   (canales de YouTube de universidades La Salle)
-// NEWS_EXTRA_FEEDS      = "Nombre|https://sitio/feed/; Otro|https://otro/rss.xml"   (RSS de universidades La Salle)
-function parseList(v: string | undefined) {
-  return (v ?? '').split(';').map((x) => x.trim()).filter(Boolean).map((x) => x.split('|').map((p) => p.trim())).filter((p) => p.length === 2 && p[0] && p[1]);
+// NEWS_YOUTUBE_CHANNELS = "Nombre|UCxxxxxxxx|region; Otro canal|UCyyyyyyyy"   (canales de YouTube de universidades La Salle)
+// NEWS_EXTRA_FEEDS      = "Nombre|https://sitio/feed/|region; Otro|https://otro/rss.xml"   (RSS de universidades La Salle)
+// region es opcional: arequipa, colombia, mexico o mundo (por defecto mundo).
+export function parseList(v: string | undefined) {
+  return (v ?? '').split(';').map((x) => x.trim()).filter(Boolean).map((x) => x.split('|').map((p) => p.trim())).filter((p) => p.length >= 2 && p[0] && p[1]);
 }
 const slug = (s: string) => s.toLowerCase().normalize('NFD').replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '').slice(0, 40);
+
+export { isRegion };
 
 export function loadSources(env: NodeJS.ProcessEnv = process.env): Source[] {
   const yt: Source[] = parseList(env.NEWS_YOUTUBE_CHANNELS)
     .filter(([, id]) => /^UC[\w-]{20,}$/.test(id))
-    .map(([name, channelId]) => ({ id: `yt-${slug(name)}`, name, site: `https://www.youtube.com/channel/${channelId}`, group: 'video', lang: 'es', kind: 'youtube', channelId }));
+    .map(([name, channelId, r]) => ({ id: `yt-${slug(name)}`, name, site: `https://www.youtube.com/channel/${channelId}`, group: 'video', lang: 'es', region: isRegion(r) ? r : 'mundo', kind: 'youtube', channelId }));
   const rss: Source[] = parseList(env.NEWS_EXTRA_FEEDS)
     .filter(([, url]) => /^https?:\/\//.test(url))
-    .map(([name, url]) => ({ id: `rss-${slug(name)}`, name, site: new URL(url).origin, group: 'lasalle', lang: 'es', kind: 'rss', url, optional: true }));
+    .map(([name, url, r]) => ({ id: `rss-${slug(name)}`, name, site: new URL(url).origin, group: 'lasalle', lang: 'es', region: isRegion(r) ? r : 'mundo', kind: 'rss', url, optional: true }));
   return [...BASE_SOURCES, ...rss, ...yt];
 }
 

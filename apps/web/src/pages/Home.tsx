@@ -6,6 +6,7 @@ import { useApi } from '../lib/useApi';
 import { api } from '../lib/api';
 import { ago, CATEGORIES, when } from '../lib/format';
 import { Avatar, Flag, Loading } from '../components/ui';
+import { REGION_LABEL } from '../components/SocialWall';
 import { News, NewsImage } from './News';
 import { burst, setThemeColor, shareLink } from '../lib/fx';
 
@@ -171,17 +172,22 @@ export default function Home() {
         </div>
       </div>
 
-      {!!news.data?.items.length && (
+      {!!news.data && (
         <section className="tech-strip" aria-label="La Salle hoy">
           <div className="tech-strip-head">
             <h2><Newspaper size={18} /> La Salle hoy</h2>
             <Link to="/noticias">Ver todo <ChevronRight size={16} /></Link>
           </div>
           <div className="tech-scroll">
+            <Link to="/noticias" className="tech-card social">
+              <span className="tech-img tech-ph social-ph" aria-hidden><MapPin size={26} /></span>
+              <span className="tech-src">Arequipa · Redes oficiales</span>
+              <strong>Lo último de ULASALLE en Facebook e Instagram</strong>
+            </Link>
             {news.data.items.map((n) => (
               <a key={n.id} className="tech-card" href={n.url} target="_blank" rel="noopener noreferrer">
                 {n.image ? <NewsImage src={n.image} alt="" className="tech-img" /> : <span className="tech-img tech-ph" aria-hidden><Newspaper size={26} /></span>}
-                <span className="tech-src">{n.kind === 'video' ? 'Video · ' : ''}{n.source}{n.forYou ? ' · Para ti' : ''}</span>
+                <span className="tech-src">{n.kind === 'video' ? 'Video · ' : ''}{n.region && n.region !== 'mundo' ? `${REGION_LABEL[n.region]} · ` : ''}{n.source}{n.forYou ? ' · Para ti' : ''}</span>
                 <strong>{n.title}</strong>
               </a>
             ))}

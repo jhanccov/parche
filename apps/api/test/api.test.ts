@@ -236,7 +236,7 @@ describe('Parche API', () => {
       const r = await call(token, 'GET', '/api/news?group=all');
       assert.equal(r.statusCode, 200, r.body);
       const j = r.json();
-      assert.ok(pedidas.every((u) => /lasalle\.org|lasalle\.edu|dlsu\.edu\.ph|lasalle\.edu\.co|salleurl\.edu|youtube\.com/.test(u)), 'solo consulta sitios de la red La Salle');
+      assert.ok(pedidas.every((u) => /lasalle\.org|lasalle\.edu|lasalle\.mx|dlsu\.edu\.ph|lasalle\.edu\.co|salleurl\.edu|youtube\.com/.test(u)), 'solo consulta sitios de la red La Salle');
       const red = j.items.find((i: any) => i.sourceId === 'lasalleorg');
       assert.equal(red.title, 'Young Lasallians from 12 countries meet in Rome - a new chapter');
       assert.equal(red.image, 'https://www.lasalle.org/img.jpg');
@@ -260,5 +260,45 @@ describe('Parche API', () => {
       globalThis.fetch = realFetch;
       clearNewsCache();
     }
+  });
+
+  test('La Salle hoy prioriza Arequipa, Colombia y México y lista sus redes oficiales', async () => {
+    const { token } = await login('regiones.prueba@ulasalle.edu.pe');
+    const realFetch = globalThis.fetch;
+    const wp = (id: number, link: string, title: string, date: string) => new Response(JSON.stringify([{ id, link, date_gmt: date, title: { rendered: title }, excerpt: { rendered: 'Nota oficial' } }]), { status: 200 });
+    globalThis.fetch = (async (url: any) => {
+      const u = String(url);
+      if (u.startsWith('https://www.lasalle.org/wp-json')) return wp(1, 'https://www.lasalle.org/nota', 'Noticia de la red mundial', '2026-11-19T10:00:00');
+      if (u.startsWith('https://www.ulasalle.edu.pe/wp-json')) return wp(2, 'https://www.ulasalle.edu.pe/nota', 'ULASALLE presenta proyectos en la feria', '2026-11-10T10:00:00');
+      if (u.startsWith('https://academia.lasalle.mx/wp-json')) return wp(3, 'https://academia.lasalle.mx/nota', 'La Salle México abre convocatoria', '2026-11-12T10:00:00');
+      return new Response('no', { status: 404 });
+    }) as any;
+    try {
+      clearNewsCache();
+      const j = (await call(token, 'GET', '/api/news?group=all')).json();
+      assert.equal(j.items[0].region, 'arequipa', 'Arequipa va primero aunque sea más antigua');
+      assert.equal(j.items[1].region, 'mexico');
+      assert.equal(j.items.at(-1).region, 'mundo');
+      const mx = (await call(token, 'GET', '/api/news?group=all&region=mexico')).json();
+      assert.ok(mx.items.length === 1 && mx.items[0].sourceId === 'lasalle-mx');
+      const bad = await call(token, 'GET', '/api/news?region=marte');
+      assert.equal(bad.statusCode, 400);
+      const so = (await call(token, 'GET', '/api/news/socials')).json();
+      assert.equal(so.items[0].region, 'arequipa');
+      const fb = so.items.find((x: any) => x.url === 'https://www.facebook.com/ulasalle');
+      assert.ok(fb && fb.embed === true, 'el Facebook de ULASALLE se puede ver con el plugin oficial');
+      assert.ok(so.items.some((x: any) => x.url === 'https://www.instagram.com/ulasalleperu' && !x.embed));
+      assert.ok(so.items.every((x: any) => x.url.startsWith('https://')));
+    } finally {
+      globalThis.fetch = realFetch;
+      clearNewsCache();
+    }
+  });
+
+  test('Las redes extra desde Render se validan', async () => {
+    const { loadSocials } = await import('../src/news/socials.js');
+    const list = loadSocials({ NEWS_SOCIAL_PAGES: 'mexico|facebook|La Salle MX|https://www.facebook.com/pagina; mexico|facebook|Falso|https://evil.example/x; luna|instagram|X|https://www.instagram.com/x; colombia|tiktok|Unisalle|http://www.tiktok.com/@u' } as any);
+    assert.ok(list.some((x) => x.region === 'mexico' && x.embed && x.handle === 'pagina'));
+    assert.ok(!list.some((x) => x.url.includes('evil') || x.url.includes('tiktok') || x.name === 'X'));
   });
 });

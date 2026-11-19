@@ -1,21 +1,28 @@
 import { MouseEvent, useEffect, useState } from 'react';
-import { ExternalLink, Globe2, Newspaper, Play, Share2, Sparkles, Star, Youtube } from 'lucide-react';
+import { ExternalLink, Globe2, MapPin, Newspaper, Play, Share2, Sparkles, Star, Youtube } from 'lucide-react';
 import { useApi } from '../lib/useApi';
 import { ago } from '../lib/format';
 import { shareLink } from '../lib/fx';
 import { Empty, Loading } from '../components/ui';
+import SocialWall, { Region, REGION_LABEL } from '../components/SocialWall';
 
 export type News = {
   id: string; title: string; summary: string; url: string; image: string | null; source: string; sourceId: string;
-  group: 'lasalle' | 'video'; kind?: 'video'; featured?: boolean; lang: 'es' | 'en' | 'pt'; publishedAt: string; topics: string[]; forYou: boolean;
+  group: 'lasalle' | 'video'; region?: Region; kind?: 'video'; featured?: boolean; lang: 'es' | 'en' | 'pt'; publishedAt: string; topics: string[]; forYou: boolean;
 };
 type Resp = { items: News[]; topics: { id: string; label: string; mine: boolean }[]; sources: { id: string; name: string; site: string; ok: boolean; count: number }[]; updatedAt: number | null; hasVideos?: boolean; featured?: boolean };
 
+// Arequipa, Colombia y México van primero; luego toda la red.
 const TABS = [
   { id: 'all', label: 'Para ti', icon: Sparkles },
+  { id: 'arequipa', label: 'Arequipa', icon: MapPin },
+  { id: 'colombia', label: 'Colombia', icon: MapPin },
+  { id: 'mexico', label: 'México', icon: MapPin },
   { id: 'lasalle', label: 'Red La Salle', icon: Globe2 },
   { id: 'video', label: 'Videos', icon: Youtube },
 ] as const;
+type Tab = (typeof TABS)[number]['id'];
+const isRegionTab = (t: Tab): t is 'arequipa' | 'colombia' | 'mexico' => t === 'arequipa' || t === 'colombia' || t === 'mexico';
 
 // Imagen externa del medio: si no carga, la tarjeta queda sin foto.
 export function NewsImage({ src, alt, className }: { src: string | null; alt: string; className: string }) {
@@ -36,6 +43,7 @@ export function NewsCard({ n, onShare }: { n: News; onShare?: (e: MouseEvent, n:
       <div className="news-body">
         <p className="news-meta">
           <strong>{n.source}</strong> · {n.featured ? <span className="news-featured"><Star size={11} fill="currentColor" /> Destacado</span> : ago(n.publishedAt)}
+          {n.region && n.region !== 'mundo' && <span className="news-region"><MapPin size={11} /> {REGION_LABEL[n.region]}</span>}
           {n.lang !== 'es' && <span className="news-lang">{n.lang.toUpperCase()}</span>}
           {n.forYou && <span className="news-foryou"><Sparkles size={12} /> Para ti</span>}
         </p>
@@ -51,10 +59,13 @@ export function NewsCard({ n, onShare }: { n: News; onShare?: (e: MouseEvent, n:
 }
 
 export default function NewsPage() {
-  const [tab, setTab] = useState<(typeof TABS)[number]['id']>('all');
+  const [tab, setTab] = useState<Tab>('all');
   const [topic, setTopic] = useState('');
+  const [wall, setWall] = useState<Region>('arequipa');
   const [toast, setToast] = useState<string | null>(null);
-  const { data, loading, error } = useApi<Resp>(`/news?group=${tab}${topic ? `&topic=${topic}` : ''}&limit=40`);
+  const q = isRegionTab(tab) ? `group=all&region=${tab}` : `group=${tab}`;
+  const { data, loading, error } = useApi<Resp>(`/news?${q}${topic ? `&topic=${topic}` : ''}&limit=40`);
+  function pick(t: Tab) { setTab(t); if (isRegionTab(t)) setWall(t); }
 
   useEffect(() => { if (!toast) return; const t = setTimeout(() => setToast(null), 2000); return () => clearTimeout(t); }, [toast]);
 
@@ -75,9 +86,11 @@ export default function NewsPage() {
 
       <div className="news-tabs" role="tablist">
         {TABS.filter((t) => t.id !== 'video' || data?.hasVideos || tab === 'video').map(({ id, label, icon: Icon }) => (
-          <button key={id} role="tab" aria-selected={tab === id} className={tab === id ? 'on' : ''} onClick={() => setTab(id)}><Icon size={16} /> {label}</button>
+          <button key={id} role="tab" aria-selected={tab === id} className={tab === id ? 'on' : ''} onClick={() => pick(id)}><Icon size={16} /> {label}</button>
         ))}
       </div>
+
+      {tab !== 'video' && tab !== 'lasalle' && <SocialWall region={wall} onRegion={(r) => { setWall(r); if (isRegionTab(tab) && r !== 'mundo') setTab(r); }} />}
 
       {data && (
         <div className="filters news-topics">
@@ -89,7 +102,9 @@ export default function NewsPage() {
       {loading && !data ? <Loading rows={3} /> : error ? <Empty title="No pudimos cargar las noticias">{error}</Empty> : data?.items.length ? (
         <div className="news-list">{data.items.map((n) => <NewsCard key={n.id} n={n} onShare={share} />)}</div>
       ) : (
-        <Empty title="Las noticias se están actualizando">Vuelve en unos minutos o prueba otra pestaña.</Empty>
+        isRegionTab(tab)
+          ? <Empty title={`Aún no hay notas web de ${REGION_LABEL[tab]}`}>Mientras tanto, mira sus publicaciones en las redes oficiales de arriba.</Empty>
+          : <Empty title="Las noticias se están actualizando">Vuelve en unos minutos o prueba otra pestaña.</Empty>
       )}
 
       {data && (

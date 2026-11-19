@@ -23,6 +23,8 @@ services:
         sync: false
       - key: NEWS_YOUTUBE_CHANNELS
         sync: false
+      - key: NEWS_SOCIAL_PAGES
+        sync: false
       - key: NEWS_EXTRA_FEEDS
         sync: false
 

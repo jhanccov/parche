@@ -13,6 +13,7 @@ const PREFETCH: Record<string, string[]> = {
   '/mapa': ['/map'],
   '/mentoria': ['/help?scope=para-mi'],
   '/retos': ['/challenges'],
+  '/noticias': ['/news?group=all&limit=40', '/news/socials'],
 };
 
 const TABS = [
